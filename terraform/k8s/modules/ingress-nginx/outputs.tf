@@ -1,4 +1,4 @@
-data "kubernetes_service" "ingress_lb" {
+data "kubernetes_service_v1" "ingress_lb" {
   metadata {
     name      = "ingress-nginx-controller"
     namespace = "ingress-nginx"
@@ -14,5 +14,5 @@ output "release_status" {
 
 output "lb_ip" {
   description = "IP público do Load Balancer do ingress-nginx"
-  value       = try(data.kubernetes_service.ingress_lb.status[0].load_balancer[0].ingress[0].ip, "pending")
+  value       = try(data.kubernetes_service_v1.ingress_lb.status[0].load_balancer[0].ingress[0].ip, "pending")
 }

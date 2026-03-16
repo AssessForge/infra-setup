@@ -4,19 +4,19 @@ terraform {
   required_providers {
     helm = {
       source  = "hashicorp/helm"
-      version = "~> 2.13"
+      version = "~> 3.0"
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
-      version = "~> 2.30"
+      version = "~> 3.0"
     }
     kubectl = {
-      source  = "gavinbunney/kubectl"
-      version = "~> 1.14"
+      source  = "alekc/kubectl"
+      version = "~> 2.0"
     }
     random = {
       source  = "hashicorp/random"
-      version = "~> 3.6"
+      version = "~> 3.8"
     }
   }
 
@@ -32,8 +32,9 @@ terraform {
   }
 }
 
+# helm 3.x: kubernetes {} block → kubernetes = {} nested object
 provider "helm" {
-  kubernetes {
+  kubernetes = {
     config_path = pathexpand("~/.kube/config-assessforge")
   }
 }

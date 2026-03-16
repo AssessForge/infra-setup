@@ -6,10 +6,13 @@ resource "helm_release" "external_secrets" {
   create_namespace = true
   version          = "0.9.20"
 
-  set {
-    name  = "installCRDs"
-    value = "true"
-  }
+  # helm 3.x: set block → list of nested objects
+  set = [
+    {
+      name  = "installCRDs"
+      value = "true"
+    },
+  ]
 
   wait    = true
   timeout = 300
@@ -40,7 +43,7 @@ resource "kubectl_manifest" "cluster_secret_store" {
   depends_on = [helm_release.external_secrets]
 }
 
-resource "kubernetes_namespace" "argocd" {
+resource "kubernetes_namespace_v1" "argocd" {
   metadata {
     name = "argocd"
     labels = {
@@ -76,6 +79,6 @@ resource "kubectl_manifest" "argocd_dex_external_secret" {
 
   depends_on = [
     kubectl_manifest.cluster_secret_store,
-    kubernetes_namespace.argocd,
+    kubernetes_namespace_v1.argocd,
   ]
 }

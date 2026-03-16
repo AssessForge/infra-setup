@@ -17,10 +17,13 @@ resource "helm_release" "kyverno" {
   create_namespace = true
   version          = "3.2.6"
 
-  set {
-    name  = "replicaCount"
-    value = "1"
-  }
+  # helm 3.x: set block → list of nested objects
+  set = [
+    {
+      name  = "replicaCount"
+      value = "1"
+    },
+  ]
 
   wait    = true
   timeout = 300
