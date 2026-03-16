@@ -36,10 +36,8 @@ module "external_secrets" {
 module "argocd" {
   source = "./modules/argocd"
 
-  argocd_hostname      = var.argocd_hostname
-  github_org           = var.github_org
-  github_team_admin    = var.github_team_admin
-  github_team_readonly = var.github_team_readonly
+  argocd_hostname = var.argocd_hostname
+  github_org      = var.github_org
 
   depends_on = [module.external_secrets]
 }

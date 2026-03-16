@@ -18,12 +18,3 @@ variable "github_org" {
   type        = string
 }
 
-variable "github_team_admin" {
-  description = "Slug do GitHub team com acesso admin ao ArgoCD"
-  type        = string
-}
-
-variable "github_team_readonly" {
-  description = "Slug do GitHub team com acesso read-only ao ArgoCD"
-  type        = string
-}

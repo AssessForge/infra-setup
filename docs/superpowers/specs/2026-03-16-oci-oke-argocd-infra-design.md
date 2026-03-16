@@ -325,8 +325,7 @@ ingress-nginx
     - `clientID: $argocd-dex-github-secret:dex.github.clientID`
     - `clientSecret: $argocd-dex-github-secret:dex.github.clientSecret`
 - **`argocd-rbac-cm`** (kubernetes_config_map):
-  - `policy.default: role:''`
-  - RBAC por GitHub teams: `<org>:<team-admin>` → `role:admin`, `<org>:<team-readonly>` → `role:readonly`
+  - `policy.default: role:admin` — todos os membros da org recebem acesso admin (sem times)
 - **`argocd-cmd-params-cm`** (kubernetes_config_map):
   - `server.login.attempts.max: "5"`, reset: `"300"`
   - Logs em JSON para todos os componentes
@@ -380,8 +379,6 @@ ingress-nginx
 | `oci_object_storage_endpoint` | Endpoint do Object Storage (para remote state) | não |
 | `argocd_hostname` | Hostname do ArgoCD (ex: `argocd.assessforge.com`) | não |
 | `github_org` | Nome da org no GitHub | não |
-| `github_team_admin` | Slug do team admin | não |
-| `github_team_readonly` | Slug do team readonly | não |
 
 ---
 
@@ -515,14 +512,8 @@ oci_object_storage_endpoint = "https://axxxxxxxxxxx.compat.objectstorage.sa-saop
 # Hostname público do ArgoCD (deve ter record DNS apontando para o IP do LB)
 argocd_hostname = "argocd.assessforge.com"
 
-# Nome da organização no GitHub (ex: minha-empresa)
+# Nome da organização no GitHub — todos os membros recebem acesso admin
 github_org = "assessforge"
-
-# Slug do team GitHub com acesso admin ao ArgoCD
-github_team_admin = "devops"
-
-# Slug do team GitHub com acesso read-only ao ArgoCD
-github_team_readonly = "developers"
 ```
 
 ---

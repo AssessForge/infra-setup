@@ -129,20 +129,14 @@ resource "helm_release" "argocd" {
                   clientSecret: $argocd-dex-github-secret:dex.github.clientSecret
                   orgs:
                     - name: ${var.github_org}
-                  loadAllGroups: true
-                  teamNameField: slug
                   scopes:
                     - read:org
           EOT
         }
 
         rbac = {
-          "policy.default" = "role:''"
+          "policy.default" = "role:admin"
           "scopes"         = "[groups, email]"
-          "policy.csv"     = <<-EOT
-            g, ${var.github_org}:${var.github_team_admin}, role:admin
-            g, ${var.github_org}:${var.github_team_readonly}, role:readonly
-          EOT
         }
 
         params = {

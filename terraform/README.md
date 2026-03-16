@@ -148,7 +148,7 @@ O ArgoCD estará disponível em `https://argocd.assessforge.com` após a propaga
 1. Acessar `https://argocd.assessforge.com`
 2. Clicar em "Login via GitHub"
 3. Autenticar com conta membro da organização GitHub configurada
-4. Acesso concedido conforme o team do usuário (`devops` = admin, `developers` = read-only)
+4. Acesso admin concedido a todos os membros da organização GitHub configurada
 
 ## Destruição dos recursos
 

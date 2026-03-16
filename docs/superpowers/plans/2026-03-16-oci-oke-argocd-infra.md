@@ -301,15 +301,6 @@ variable "github_org" {
   type        = string
 }
 
-variable "github_team_admin" {
-  description = "Slug do GitHub team com acesso admin ao ArgoCD"
-  type        = string
-}
-
-variable "github_team_readonly" {
-  description = "Slug do GitHub team com acesso read-only ao ArgoCD"
-  type        = string
-}
 ```
 
 - [ ] **Step 4: Criar `terraform/k8s/terraform.tfvars.example`**
@@ -324,14 +315,8 @@ oci_object_storage_endpoint = "https://NAMESPACE.compat.objectstorage.sa-saopaul
 # Hostname público do ArgoCD
 argocd_hostname = "argocd.assessforge.com"
 
-# Organização no GitHub
+# Organização no GitHub — todos os membros recebem acesso admin
 github_org = "assessforge"
-
-# Slug do team admin (GitHub > Org > Teams)
-github_team_admin = "devops"
-
-# Slug do team readonly
-github_team_readonly = "developers"
 ```
 
 - [ ] **Step 5: Criar placeholders**
@@ -1768,15 +1753,6 @@ variable "github_org" {
   type        = string
 }
 
-variable "github_team_admin" {
-  description = "Slug do GitHub team com acesso admin"
-  type        = string
-}
-
-variable "github_team_readonly" {
-  description = "Slug do GitHub team com acesso read-only"
-  type        = string
-}
 ```
 
 - [ ] **Step 2: Criar `terraform/k8s/modules/argocd/main.tf` — senha Redis e Helm release**
@@ -1916,8 +1892,6 @@ resource "helm_release" "argocd" {
                   clientSecret: $argocd-dex-github-secret:dex.github.clientSecret
                   orgs:
                     - name: ${var.github_org}
-                  loadAllGroups: true
-                  teamNameField: slug
                   scopes:
                     - read:org
           EOT
@@ -1925,12 +1899,8 @@ resource "helm_release" "argocd" {
 
         # argocd-rbac-cm
         rbac = {
-          "policy.default" = "role:''"
+          "policy.default" = "role:admin"
           "scopes"         = "[groups, email]"
-          "policy.csv"     = <<-EOT
-            g, ${var.github_org}:${var.github_team_admin}, role:admin
-            g, ${var.github_org}:${var.github_team_readonly}, role:readonly
-          EOT
         }
 
         # argocd-cmd-params-cm
@@ -2523,10 +2493,8 @@ module "external_secrets" {
 module "argocd" {
   source = "./modules/argocd"
 
-  argocd_hostname      = var.argocd_hostname
-  github_org           = var.github_org
-  github_team_admin    = var.github_team_admin
-  github_team_readonly = var.github_team_readonly
+  argocd_hostname = var.argocd_hostname
+  github_org      = var.github_org
 
   depends_on = [module.external_secrets]
 }
@@ -2756,7 +2724,7 @@ O ArgoCD estará disponível em `https://argocd.assessforge.com` após a propaga
 1. Acessar `https://argocd.assessforge.com`
 2. Clicar em "Login via GitHub"
 3. Autenticar com conta membro da organização GitHub configurada
-4. Acesso concedido conforme o team do usuário (`devops` = admin, `developers` = read-only)
+4. Acesso admin concedido a todos os membros da organização GitHub configurada
 
 ## Destruição dos recursos
 
