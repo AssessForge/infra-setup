@@ -42,8 +42,6 @@ module "oci_oke" {
   public_subnet_id     = module.oci_network.public_subnet_id
   private_subnet_id    = module.oci_network.private_subnet_id
   workers_nsg_id       = module.oci_network.workers_nsg_id
-  lb_nsg_id            = module.oci_network.lb_nsg_id
-  bastion_nsg_id       = module.oci_network.bastion_nsg_id
   bastion_allowed_cidr = var.bastion_allowed_cidr
   freeform_tags        = local.freeform_tags
 

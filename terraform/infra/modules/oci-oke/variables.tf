@@ -28,14 +28,10 @@ variable "workers_nsg_id" {
   type        = string
 }
 
-variable "lb_nsg_id" {
-  description = "OCID do NSG do Load Balancer"
+variable "kubernetes_version" {
+  description = "Versão do Kubernetes para o cluster OKE. Deixe vazio para usar a versão mais recente disponível."
   type        = string
-}
-
-variable "bastion_nsg_id" {
-  description = "OCID do NSG do Bastion"
-  type        = string
+  default     = ""
 }
 
 variable "bastion_allowed_cidr" {

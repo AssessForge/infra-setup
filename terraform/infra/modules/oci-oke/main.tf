@@ -4,8 +4,11 @@ data "oci_containerengine_cluster_option" "k8s_versions" {
 }
 
 locals {
-  # Pega a última versão disponível (ex: v1.31.1)
-  k8s_version = reverse(
+  # Selects the latest available version using lexicographic sort.
+  # Safe while all supported versions share the same major.minor prefix length
+  # (e.g. v1.28–v1.31). If OCI ever offers v1.9.x alongside v1.10.x+ this
+  # would break — set var.kubernetes_version to pin an explicit version instead.
+  k8s_version = var.kubernetes_version != "" ? var.kubernetes_version : reverse(
     sort(
       [for v in data.oci_containerengine_cluster_option.k8s_versions.kubernetes_versions : v]
     )
@@ -77,12 +80,12 @@ resource "oci_logging_log" "oke_audit" {
 
 # Image Oracle Linux mais recente para A1
 data "oci_core_images" "oracle_linux_a1" {
-  compartment_id           = var.compartment_ocid
-  operating_system         = "Oracle Linux"
-  shape                    = "VM.Standard.A1.Flex"
-  sort_by                  = "TIMECREATED"
-  sort_order               = "DESC"
-  state                    = "AVAILABLE"
+  compartment_id   = var.compartment_ocid
+  operating_system = "Oracle Linux"
+  shape            = "VM.Standard.A1.Flex"
+  sort_by          = "TIMECREATED"
+  sort_order       = "DESC"
+  state            = "AVAILABLE"
 }
 
 data "oci_identity_availability_domains" "ads" {
