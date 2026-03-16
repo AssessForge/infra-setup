@@ -137,7 +137,9 @@ resource "helm_release" "argocd" {
         rbac = {
           "policy.default" = "role:''"
           "scopes"         = "[groups, email]"
-          "policy.csv"     = "g, ${var.github_org}, role:admin"
+          "policy.csv"     = <<-EOT
+            g, ${var.github_org}, role:admin
+          EOT
         }
 
         params = {
