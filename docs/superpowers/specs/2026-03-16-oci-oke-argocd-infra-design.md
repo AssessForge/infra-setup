@@ -325,7 +325,8 @@ ingress-nginx
     - `clientID: $argocd-dex-github-secret:dex.github.clientID`
     - `clientSecret: $argocd-dex-github-secret:dex.github.clientSecret`
 - **`argocd-rbac-cm`** (kubernetes_config_map):
-  - `policy.default: role:admin` — todos os membros da org recebem acesso admin (sem times)
+  - `policy.default: role:''` — nega acesso a quem não está na org
+  - `policy.csv: g, <github_org>, role:admin` — membros da org recebem admin via group claim do Dex
 - **`argocd-cmd-params-cm`** (kubernetes_config_map):
   - `server.login.attempts.max: "5"`, reset: `"300"`
   - Logs em JSON para todos os componentes

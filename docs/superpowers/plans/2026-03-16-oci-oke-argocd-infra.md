@@ -1899,8 +1899,9 @@ resource "helm_release" "argocd" {
 
         # argocd-rbac-cm
         rbac = {
-          "policy.default" = "role:admin"
+          "policy.default" = "role:''"
           "scopes"         = "[groups, email]"
+          "policy.csv"     = "g, ${var.github_org}, role:admin"
         }
 
         # argocd-cmd-params-cm
