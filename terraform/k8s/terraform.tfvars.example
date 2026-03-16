@@ -1,0 +1,17 @@
+# Região OCI (mesmo valor do infra/)
+region = "sa-saopaulo-1"
+
+# Endpoint Object Storage — substituir NAMESPACE pelo valor de: oci os ns get
+oci_object_storage_endpoint = "https://NAMESPACE.compat.objectstorage.sa-saopaulo-1.oraclecloud.com"
+
+# Hostname público do ArgoCD
+argocd_hostname = "argocd.assessforge.com"
+
+# Organização no GitHub
+github_org = "assessforge"
+
+# Slug do team admin (GitHub > Org > Teams)
+github_team_admin = "devops"
+
+# Slug do team readonly
+github_team_readonly = "developers"
