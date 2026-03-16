@@ -68,3 +68,47 @@ resource "oci_cloud_guard_target" "assessforge" {
     oci_cloud_guard_responder_recipe.assessforge,
   ]
 }
+
+# Tópico ONS para alertas do Cloud Guard
+resource "oci_ons_notification_topic" "cloud_guard" {
+  compartment_id = var.compartment_ocid
+  name           = "assessforge-cloud-guard-alerts"
+  description    = "Alertas de problemas detectados pelo Cloud Guard"
+  freeform_tags  = var.freeform_tags
+}
+
+# Subscription por email (condicional — só cria se notification_email estiver definido)
+resource "oci_ons_subscription" "cloud_guard_email" {
+  count = var.notification_email != "" ? 1 : 0
+
+  compartment_id = var.compartment_ocid
+  topic_id       = oci_ons_notification_topic.cloud_guard.id
+  protocol       = "EMAIL"
+  endpoint       = var.notification_email
+  freeform_tags  = var.freeform_tags
+}
+
+# OCI Events rule — encaminha eventos do Cloud Guard para o tópico ONS
+resource "oci_events_rule" "cloud_guard_alerts" {
+  compartment_id = var.compartment_ocid
+  display_name   = "assessforge-cloud-guard-events"
+  is_enabled     = true
+  freeform_tags  = var.freeform_tags
+
+  condition = jsonencode({
+    eventType = [
+      "com.oraclecloud.cloudguard.problemdetected",
+      "com.oraclecloud.cloudguard.problemthresholdreached",
+    ]
+  })
+
+  actions {
+    actions {
+      action_type = "ONS"
+      is_enabled  = true
+      topic_id    = oci_ons_notification_topic.cloud_guard.id
+    }
+  }
+
+  depends_on = [oci_cloud_guard_target.assessforge]
+}

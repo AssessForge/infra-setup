@@ -117,12 +117,19 @@ resource "oci_core_network_security_group_security_rule" "lb_ingress_https" {
   }
 }
 
-resource "oci_core_network_security_group_security_rule" "lb_egress_all" {
+resource "oci_core_network_security_group_security_rule" "lb_egress_workers" {
   network_security_group_id = oci_core_network_security_group.lb.id
   direction                 = "EGRESS"
-  protocol                  = "all"
-  destination               = "0.0.0.0/0"
+  protocol                  = "6" # TCP
+  destination               = var.private_subnet_cidr
   destination_type          = "CIDR_BLOCK"
+
+  tcp_options {
+    destination_port_range {
+      min = 30000
+      max = 32767
+    }
+  }
 }
 
 # NSG — Worker nodes
@@ -133,7 +140,7 @@ resource "oci_core_network_security_group" "workers" {
   freeform_tags  = var.freeform_tags
 }
 
-# Ingress do LB para os workers (tráfego do ingress-nginx)
+# Ingress do LB para os workers — apenas NodePort range (30000-32767)
 resource "oci_core_network_security_group_security_rule" "workers_ingress_from_lb" {
   network_security_group_id = oci_core_network_security_group.workers.id
   direction                 = "INGRESS"
@@ -143,8 +150,8 @@ resource "oci_core_network_security_group_security_rule" "workers_ingress_from_l
 
   tcp_options {
     destination_port_range {
-      min = 1
-      max = 65535
+      min = 30000
+      max = 32767
     }
   }
 }
@@ -167,21 +174,6 @@ resource "oci_core_network_security_group_security_rule" "workers_ingress_pod_ci
   source_type               = "CIDR_BLOCK"
 }
 
-# Bastion → OKE API endpoint (port 6443)
-resource "oci_core_network_security_group_security_rule" "workers_ingress_bastion_api" {
-  network_security_group_id = oci_core_network_security_group.workers.id
-  direction                 = "INGRESS"
-  protocol                  = "6"
-  source                    = var.public_subnet_cidr
-  source_type               = "CIDR_BLOCK"
-
-  tcp_options {
-    destination_port_range {
-      min = 6443
-      max = 6443
-    }
-  }
-}
 
 # Egress workers → tudo
 resource "oci_core_network_security_group_security_rule" "workers_egress_all" {
@@ -239,6 +231,30 @@ resource "oci_core_subnet" "private" {
   freeform_tags              = var.freeform_tags
 }
 
+# NSG — API endpoint do cluster OKE (separado dos workers)
+resource "oci_core_network_security_group" "api_endpoint" {
+  compartment_id = var.compartment_ocid
+  vcn_id         = oci_core_vcn.main.id
+  display_name   = "assessforge-nsg-api-endpoint"
+  freeform_tags  = var.freeform_tags
+}
+
+# Bastion → API endpoint (port 6443 apenas)
+resource "oci_core_network_security_group_security_rule" "api_endpoint_ingress_bastion" {
+  network_security_group_id = oci_core_network_security_group.api_endpoint.id
+  direction                 = "INGRESS"
+  protocol                  = "6"
+  source                    = oci_core_network_security_group.bastion.id
+  source_type               = "NETWORK_SECURITY_GROUP"
+
+  tcp_options {
+    destination_port_range {
+      min = 6443
+      max = 6443
+    }
+  }
+}
+
 resource "oci_logging_log_group" "vcn_flow_logs" {
   compartment_id = var.compartment_ocid
   display_name   = "assessforge-vcn-flow-logs"
@@ -262,5 +278,5 @@ resource "oci_logging_log" "vcn_flow_log" {
   }
 
   is_enabled         = true
-  retention_duration = 30
+  retention_duration = 90
 }

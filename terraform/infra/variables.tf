@@ -24,6 +24,12 @@ variable "bastion_allowed_cidr" {
   type        = string
 }
 
+variable "notification_email" {
+  description = "Email para alertas do Cloud Guard (opcional)"
+  type        = string
+  default     = ""
+}
+
 variable "github_oauth_client_id" {
   description = "Client ID do GitHub OAuth App"
   type        = string

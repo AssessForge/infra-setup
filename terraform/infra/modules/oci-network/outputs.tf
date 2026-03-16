@@ -27,3 +27,8 @@ output "bastion_nsg_id" {
   description = "OCID do NSG do Bastion"
   value       = oci_core_network_security_group.bastion.id
 }
+
+output "api_endpoint_nsg_id" {
+  description = "OCID do NSG dedicado ao API endpoint do OKE"
+  value       = oci_core_network_security_group.api_endpoint.id
+}

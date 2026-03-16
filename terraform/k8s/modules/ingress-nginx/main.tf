@@ -26,6 +26,26 @@ resource "helm_release" "ingress_nginx" {
     value = "10"
   }
 
+  set {
+    name  = "controller.resources.requests.cpu"
+    value = "100m"
+  }
+
+  set {
+    name  = "controller.resources.requests.memory"
+    value = "128Mi"
+  }
+
+  set {
+    name  = "controller.resources.limits.cpu"
+    value = "500m"
+  }
+
+  set {
+    name  = "controller.resources.limits.memory"
+    value = "512Mi"
+  }
+
   wait    = true
   timeout = 300
 }

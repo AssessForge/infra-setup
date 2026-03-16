@@ -28,6 +28,11 @@ variable "workers_nsg_id" {
   type        = string
 }
 
+variable "api_endpoint_nsg_id" {
+  description = "OCID do NSG dedicado ao API endpoint do OKE"
+  type        = string
+}
+
 variable "kubernetes_version" {
   description = "Versão do Kubernetes para o cluster OKE. Deixe vazio para usar a versão mais recente disponível."
   type        = string

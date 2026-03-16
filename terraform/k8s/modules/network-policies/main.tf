@@ -147,22 +147,36 @@ resource "kubectl_manifest" "argocd_internal_only_dex" {
   YAML
 }
 
-# Egress liberado para todos os pods argocd (DNS + GitHub + OCI APIs)
-resource "kubectl_manifest" "argocd_egress_all" {
+# Egress para componentes ArgoCD (exceto Redis) — DNS + HTTPS apenas
+resource "kubectl_manifest" "argocd_egress_dns_https" {
   depends_on = [kubectl_manifest.deny_all_default]
   yaml_body  = <<-YAML
     apiVersion: networking.k8s.io/v1
     kind: NetworkPolicy
     metadata:
-      name: argocd-egress-allow-all
+      name: argocd-egress-dns-https
       namespace: argocd
       labels:
         app.kubernetes.io/managed-by: terraform
     spec:
-      podSelector: {}
+      podSelector:
+        matchExpressions:
+          - key: app.kubernetes.io/component
+            operator: NotIn
+            values: [redis]
       policyTypes:
         - Egress
       egress:
-        - {}
+        - ports:
+            - protocol: UDP
+              port: 53
+            - protocol: TCP
+              port: 53
+        - ports:
+            - protocol: TCP
+              port: 443
   YAML
 }
+
+# Redis não precisa de egress (cache in-cluster — bloqueado pelo deny-all-default)
+# Sem resource adicional: a ausência de regra de egress para redis é intencional.

@@ -54,6 +54,9 @@ resource "kubectl_manifest" "policy_disallow_root_containers" {
                 containers:
                   - securityContext:
                       runAsNonRoot: true
+                initContainers:
+                  - securityContext:
+                      runAsNonRoot: true
   YAML
 
   depends_on = [helm_release.kyverno]
@@ -87,6 +90,9 @@ resource "kubectl_manifest" "policy_disallow_privilege_escalation" {
                 containers:
                   - securityContext:
                       allowPrivilegeEscalation: false
+                initContainers:
+                  - securityContext:
+                      allowPrivilegeEscalation: false
   YAML
 
   depends_on = [helm_release.kyverno]
@@ -118,6 +124,9 @@ resource "kubectl_manifest" "policy_require_readonly_rootfs" {
             pattern:
               spec:
                 containers:
+                  - securityContext:
+                      readOnlyRootFilesystem: true
+                initContainers:
                   - securityContext:
                       readOnlyRootFilesystem: true
   YAML
@@ -194,6 +203,44 @@ resource "kubectl_manifest" "policy_require_resource_limits" {
                       limits:
                         cpu: "?*"
                         memory: "?*"
+                initContainers:
+                  - resources:
+                      limits:
+                        cpu: "?*"
+                        memory: "?*"
+  YAML
+
+  depends_on = [helm_release.kyverno]
+}
+
+resource "kubectl_manifest" "policy_require_seccomp" {
+  yaml_body = <<-YAML
+    apiVersion: kyverno.io/v1
+    kind: ClusterPolicy
+    metadata:
+      name: require-seccomp-profile
+      annotations:
+        app.kubernetes.io/managed-by: terraform
+    spec:
+      validationFailureAction: Enforce
+      background: true
+      rules:
+        - name: check-seccomp
+          match:
+            any:
+              - resources:
+                  kinds: ["Pod"]
+          exclude:
+            any:
+              - resources:
+                  namespaces: ${jsonencode(local.excluded_namespaces)}
+          validate:
+            message: "Pods devem definir seccompProfile RuntimeDefault ou Localhost"
+            pattern:
+              spec:
+                securityContext:
+                  seccompProfile:
+                    type: "RuntimeDefault | Localhost"
   YAML
 
   depends_on = [helm_release.kyverno]

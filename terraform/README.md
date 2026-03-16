@@ -2,6 +2,19 @@
 
 Terraform production-ready para provisionar OKE (Oracle Kubernetes Engine) no Oracle Always Free Tier, com ArgoCD, GitHub SSO via Dex, Kyverno e External Secrets Operator.
 
+## Arquitetura de segurança
+
+| Camada | Controle |
+|---|---|
+| **Rede OCI** | VCN segmentada (pública/privada), NSG dedicado por função (LB, workers, API endpoint, bastion), egress do LB restrito a NodePorts |
+| **Cluster OKE** | API endpoint privado, sem IP público, acesso via OCI Bastion Service (subnet privada) |
+| **IAM** | Dynamic Group com `resource.type = 'workload'` (apenas pods OKE via OIDC), sem instance principals genéricos |
+| **Secrets** | OCI Vault AES-256 + External Secrets Operator com Workload Identity; ClusterSecretStore restrito ao namespace `argocd` |
+| **ArgoCD** | GitHub SSO (sem admin local), login.attempts.max=5, exec desabilitado, AppProject com blocklist de RBAC cluster-wide |
+| **Pod Security** | Namespace `argocd` com PSS `restricted`; Kyverno (6 ClusterPolicies) para demais namespaces |
+| **NetworkPolicies** | Default-deny no namespace `argocd`; egress limitado a DNS+HTTPS; Redis sem egress |
+| **Observabilidade** | OKE audit logs + VCN flow logs com 90 dias de retenção; Cloud Guard com eventos para ONS |
+
 ## Pré-requisitos
 
 - [ ] [Terraform ≥ 1.5](https://developer.hashicorp.com/terraform/install)
@@ -11,6 +24,7 @@ Terraform production-ready para provisionar OKE (Oracle Kubernetes Engine) no Or
   - Authorization callback URL: `https://argocd.assessforge.com/api/dex/callback`
 - [ ] Domínio configurado no Cloudflare (ex: `assessforge.com`)
 - [ ] SSH key pair (`~/.ssh/id_rsa`) para sessões Bastion
+- [ ] (Opcional) Email para alertas do Cloud Guard — preencher `notification_email` no `terraform.tfvars`
 
 ## Etapa 0 — Criar bucket de state
 
@@ -148,13 +162,29 @@ O ArgoCD estará disponível em `https://argocd.assessforge.com` após a propaga
 1. Acessar `https://argocd.assessforge.com`
 2. Clicar em "Login via GitHub"
 3. Autenticar com conta membro da organização GitHub configurada
-4. Acesso admin concedido a todos os membros da organização GitHub configurada
+
+> **Nota de segurança:** Todos os membros da organização recebem `role:admin`. Para ambientes multi-time, ajuste `policy.csv` no módulo `argocd` para mapear times específicos (`github_org:team-name`) a roles menos permissivos.
+
+## AppProject ArgoCD
+
+O Terraform cria automaticamente o AppProject `assessforge` com as seguintes restrições:
+
+- **Fontes:** qualquer repositório (`*`)
+- **Destinos:** qualquer namespace no cluster local
+- **Bloqueado (clusterResourceBlacklist):** `ClusterRole`, `ClusterRoleBinding`, `Node`, `PriorityClass`
+- **Bloqueado (namespaceResourceBlacklist):** `ResourceQuota`
+
+> Ao criar Applications no ArgoCD, use o projeto `assessforge` em vez do `default`.
 
 ## Destruição dos recursos
 
 ```bash
-# ATENÇÃO: lifecycle { prevent_destroy = true } protege cluster OKE, Vault e Master Key
-# Remover o lifecycle antes de destruir
+# ATENÇÃO: lifecycle { prevent_destroy = true } protege:
+#   - Cluster OKE
+#   - Node pool OKE
+#   - OCI Vault
+#   - Master Key do Vault
+# Remover o lifecycle de cada resource antes de destruir
 
 # Stage 2 primeiro
 cd k8s/ && terraform destroy

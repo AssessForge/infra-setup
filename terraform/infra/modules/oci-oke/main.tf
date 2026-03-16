@@ -33,7 +33,7 @@ resource "oci_containerengine_cluster" "main" {
 
   endpoint_config {
     is_public_ip_enabled = false
-    nsg_ids              = [var.workers_nsg_id]
+    nsg_ids              = [var.api_endpoint_nsg_id]
     subnet_id            = var.private_subnet_id
   }
 
@@ -73,7 +73,7 @@ resource "oci_logging_log" "oke_audit" {
   }
 
   is_enabled         = true
-  retention_duration = 30
+  retention_duration = 90
 
   depends_on = [oci_containerengine_cluster.main]
 }
@@ -123,13 +123,17 @@ resource "oci_containerengine_node_pool" "main" {
 
     nsg_ids = [var.workers_nsg_id]
   }
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
-# OCI Bastion Service — reside na subnet PÚBLICA para ser acessível da internet
+# OCI Bastion Service — target_subnet_id aponta para a subnet PRIVADA onde estão os workers
 resource "oci_bastion_bastion" "main" {
   bastion_type                 = "STANDARD"
   compartment_id               = var.compartment_ocid
-  target_subnet_id             = var.public_subnet_id
+  target_subnet_id             = var.private_subnet_id
   name                         = "assessforge-bastion"
   client_cidr_block_allow_list = [var.bastion_allowed_cidr]
   freeform_tags                = var.freeform_tags

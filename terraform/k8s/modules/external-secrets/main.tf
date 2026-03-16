@@ -22,6 +22,10 @@ resource "kubectl_manifest" "cluster_secret_store" {
     metadata:
       name: oci-vault-store
     spec:
+      conditions:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: argocd
       provider:
         oracle:
           vault: "${var.vault_ocid}"
@@ -40,7 +44,7 @@ resource "kubernetes_namespace" "argocd" {
   metadata {
     name = "argocd"
     labels = {
-      "pod-security.kubernetes.io/enforce" = "baseline"
+      "pod-security.kubernetes.io/enforce" = "restricted"
       "app.kubernetes.io/managed-by"       = "terraform"
     }
   }

@@ -25,10 +25,11 @@ module "oci_iam" {
 module "oci_cloud_guard" {
   source = "./modules/oci-cloud-guard"
 
-  tenancy_ocid     = var.tenancy_ocid
-  compartment_ocid = var.compartment_ocid
-  region           = var.region
-  freeform_tags    = local.freeform_tags
+  tenancy_ocid       = var.tenancy_ocid
+  compartment_ocid   = var.compartment_ocid
+  region             = var.region
+  notification_email = var.notification_email
+  freeform_tags      = local.freeform_tags
 }
 
 # --- OKE (depende de network + iam) ---
@@ -42,6 +43,7 @@ module "oci_oke" {
   public_subnet_id     = module.oci_network.public_subnet_id
   private_subnet_id    = module.oci_network.private_subnet_id
   workers_nsg_id       = module.oci_network.workers_nsg_id
+  api_endpoint_nsg_id  = module.oci_network.api_endpoint_nsg_id
   bastion_allowed_cidr = var.bastion_allowed_cidr
   freeform_tags        = local.freeform_tags
 

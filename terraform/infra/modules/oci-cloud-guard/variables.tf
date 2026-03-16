@@ -13,6 +13,12 @@ variable "region" {
   type        = string
 }
 
+variable "notification_email" {
+  description = "Email para receber alertas do Cloud Guard via OCI Notifications. Deixe vazio para não criar subscription."
+  type        = string
+  default     = ""
+}
+
 variable "freeform_tags" {
   description = "Tags aplicadas a todos os recursos"
   type        = map(string)

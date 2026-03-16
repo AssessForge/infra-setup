@@ -1,8 +1,3 @@
-resource "random_password" "redis" {
-  length  = 32
-  special = false
-}
-
 resource "helm_release" "argocd" {
   name             = "argocd"
   repository       = "https://argoproj.github.io/argo-helm"
@@ -18,9 +13,10 @@ resource "helm_release" "argocd" {
     yamlencode({
       global = {
         securityContext = {
-          runAsNonRoot = true
-          runAsUser    = 999
-          fsGroup      = 999
+          runAsNonRoot   = true
+          runAsUser      = 999
+          fsGroup        = 999
+          seccompProfile = { type = "RuntimeDefault" }
         }
       }
 
@@ -110,10 +106,6 @@ resource "helm_release" "argocd" {
       }
 
       configs = {
-        secret = {
-          redisPassword = random_password.redis.result
-        }
-
         cm = {
           "url"                     = "https://${var.argocd_hostname}"
           "admin.enabled"           = "false"
@@ -193,6 +185,40 @@ resource "kubernetes_ingress_v1" "argocd" {
       }
     }
   }
+
+  depends_on = [helm_release.argocd]
+}
+
+# AppProject com restrições de RBAC para workloads de aplicação
+resource "kubectl_manifest" "argocd_appproject" {
+  yaml_body = <<-YAML
+    apiVersion: argoproj.io/v1alpha1
+    kind: AppProject
+    metadata:
+      name: assessforge
+      namespace: argocd
+      labels:
+        app.kubernetes.io/managed-by: terraform
+    spec:
+      description: "Project para workloads de aplicação — bloqueia criação de RBAC cluster-wide"
+      sourceRepos:
+        - '*'
+      destinations:
+        - namespace: '*'
+          server: 'https://kubernetes.default.svc'
+      clusterResourceBlacklist:
+        - group: 'rbac.authorization.k8s.io'
+          kind: ClusterRole
+        - group: 'rbac.authorization.k8s.io'
+          kind: ClusterRoleBinding
+        - group: ''
+          kind: Node
+        - group: 'scheduling.k8s.io'
+          kind: PriorityClass
+      namespaceResourceBlacklist:
+        - group: ''
+          kind: ResourceQuota
+  YAML
 
   depends_on = [helm_release.argocd]
 }
