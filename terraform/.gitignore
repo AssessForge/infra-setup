@@ -1,0 +1,15 @@
+# Terraform state e cache
+*.tfstate
+*.tfstate.backup
+*.tfplan
+.terraform/
+.terraform.lock.hcl
+
+# Valores sensíveis — NUNCA commitar
+*.tfvars
+
+# Kubeconfig gerado
+**/config-assessforge
+
+# Arquivos de sistema
+.DS_Store
