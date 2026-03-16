@@ -1,0 +1,19 @@
+# OCID do tenancy — OCI Console > Profile > Tenancy
+tenancy_ocid = "ocid1.tenancy.oc1..EXAMPLE"
+
+# OCID do compartment (pode ser o root compartment = tenancy_ocid)
+compartment_ocid = "ocid1.compartment.oc1..EXAMPLE"
+
+# Região OCI
+region = "sa-saopaulo-1"
+
+# Nome do cluster OKE
+cluster_name = "assessforge-oke"
+
+# Seu IP público em CIDR — descobrir via: curl -s ifconfig.me
+bastion_allowed_cidr = "1.2.3.4/32"
+
+# GitHub OAuth App — GitHub > Settings > Developer Settings > OAuth Apps
+# NUNCA commitar estes valores
+github_oauth_client_id     = "Ov23liXXXXXXXXXXXX"
+github_oauth_client_secret = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
