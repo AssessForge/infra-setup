@@ -65,7 +65,11 @@ Plans:
   4. Envoy Gateway is the active ingress path: GatewayClass, Gateway, and HTTPRoute for ArgoCD are all `Accepted` and traffic flows through the OCI Flexible Load Balancer
   5. `kubectl top nodes` and `kubectl top pods` return resource usage data
 **UI hint**: yes
-**Plans**: TBD
+**Plans:** 3 plans
+Plans:
+- [ ] 03-01-PLAN.md — ArgoCD self-management with GitHub SSO, RBAC, and security hardening
+- [ ] 03-02-PLAN.md — Envoy Gateway routing with OCI LB and Gateway API resources
+- [ ] 03-03-PLAN.md — cert-manager TLS with Let's Encrypt and metrics-server for OKE
 
 ## Progress
 
@@ -76,4 +80,4 @@ Phases execute in numeric order: 1 → 2 → 3
 |-------|----------------|--------|-----------|
 | 1. Cleanup & IAM Bootstrap | 0/2 | Not started | - |
 | 2. GitOps Repository & ESO | 0/3 | Not started | - |
-| 3. ArgoCD Self-Management & Addons | 0/TBD | Not started | - |
+| 3. ArgoCD Self-Management & Addons | 0/3 | Not started | - |
