@@ -13,8 +13,8 @@
 
 - **D-01:** Org-wide admin RBAC — all AssessForge GitHub org members get `role:admin`. Default policy denies access to non-members.
 - **D-02:** All ArgoCD security hardening values in `environments/default/addons/argocd/values.yaml` (admin.enabled=false, exec.enabled=false, security contexts, resource limits). Single source of truth.
-- **D-03:** Dex GitHub connector references OAuth credentials via env vars (`$GITHUB_CLIENT_ID` / `$GITHUB_CLIENT_SECRET`) sourced from `argocd-dex-github-secret` ExternalSecret, mounted via `dex.envFrom`.
-- **D-04:** OCI LB configured via Service annotations on Envoy Gateway controller Service through `envoyService.annotations` in an EnvoyProxy resource — flexible shape, 10Mbps min/max.
+- **D-03:** Dex GitHub connector references OAuth credentials via env vars (`$client_id` / `$client_secret`) sourced from `argocd-dex-github-secret` ExternalSecret, mounted via `dex.envFrom`. Env var names must match ExternalSecret `secretKey` values exactly. *(Updated: original discussion used `$GITHUB_CLIENT_ID`/`$GITHUB_CLIENT_SECRET` but ExternalSecret keys are `client_id`/`client_secret`.)*
+- **D-04:** OCI LB configured via EnvoyProxy custom resource with Service annotations (`envoyService.annotations`) — flexible shape, 10Mbps min/max. *(Updated: Helm values approach does not apply to Envoy Gateway data-plane; OCI LB annotations are set on the EnvoyProxy CR.)*
 - **D-05:** Envoy Gateway Helm chart manages its own CRDs (default chart behavior). No separate CRD Application needed.
 - **D-06:** TLS terminates at Envoy Gateway. Plain HTTP from Gateway to ArgoCD Server on port 8080. ArgoCD Server must run with `--insecure`.
 - **D-07:** HTTP-01 challenge solver uses cert-manager's native Gateway API support (v1.15+ `enableGatewayAPI`). cert-manager creates temporary HTTPRoutes for ACME challenges automatically.
@@ -58,7 +58,7 @@ None — discussion stayed within phase scope.
 | GW-05 | OCI LB verified as free tier eligible | Confirmed: 1 flexible LB in Always Free tier |
 | CERT-01 | cert-manager deployed via GitOps with pinned chart version | Stub Application exists; values research complete |
 | CERT-02 | ClusterIssuer for Let's Encrypt with HTTP-01 Gateway solver | Full ClusterIssuer YAML with gatewayHTTPRoute solver documented |
-| CERT-03 | Certificate for argocd.assessforge.com | Handled via Gateway annotation approach (no separate Certificate resource) |
+| CERT-03 | Certificate for argocd.assessforge.com | Handled via Gateway annotation approach (no separate Certificate resource); cert-manager auto-creates Certificate in envoy-gateway-system namespace |
 | CERT-04 | TLS end-to-end: LB → Envoy Gateway → ArgoCD (no browser warnings) | Full chain documented; ordering dependencies captured |
 | MS-01 | metrics-server deployed via GitOps with pinned chart version | Stub Application exists; Helm values for OKE ARM64 documented |
 | MS-02 | `kubectl top nodes` and `kubectl top pods` return data | OKE private cluster flags (--kubelet-preferred-address-types, --kubelet-insecure-tls) documented |
@@ -73,7 +73,7 @@ Phase 3 fills in all stub values files and adds supplementary manifest directori
 
 The four work streams are: (1) ArgoCD self-management with GitHub SSO via Dex and security hardening, (2) Envoy Gateway with OCI Flexible Load Balancer and Gateway API routing resources, (3) cert-manager with Let's Encrypt HTTP-01 via Gateway API and annotation-driven TLS on the Gateway, and (4) metrics-server with OKE-specific ARM64/private-cluster flags. All four deploy in sync wave 3, with cert-manager and Envoy Gateway having an implicit ordering dependency (Gateway must exist before cert-manager tries to create HTTPRoutes for challenges).
 
-**Primary recommendation:** Follow the annotation-driven Gateway TLS pattern — annotate the Gateway with `cert-manager.io/cluster-issuer` and include a `certificateRefs` in the TLS listener. cert-manager creates the Certificate automatically without a separate manifest. Use `dex.envFrom` + `$GITHUB_CLIENT_ID`/`$GITHUB_CLIENT_SECRET` env var substitution in `dex.config` — this is the correct pattern for referencing ExternalSecret-sourced keys in Dex connectors.
+**Primary recommendation:** Follow the annotation-driven Gateway TLS pattern — annotate the Gateway with `cert-manager.io/cluster-issuer` and include a `certificateRefs` in the TLS listener. cert-manager creates the Certificate automatically without a separate manifest. Use `dex.envFrom` + `$client_id`/`$client_secret` env var substitution in `dex.config` — the env var names must match the ExternalSecret `secretKey` values exactly (`client_id`, `client_secret`).
 
 ---
 
@@ -187,7 +187,7 @@ configs:
 
 [VERIFIED: dex.envFrom pattern from ArgoCD argo-helm values.yaml — confirmed `dex.envFrom: []` with secretRef commented example]
 [VERIFIED: ExternalSecret keys are `client_id` and `client_secret` — confirmed in `external-secret-github-oauth.yaml`]
-[ASSUMED: `$client_id` and `$client_secret` env var substitution within dex.config — Dex supports `$VARNAME` in connector config via envFrom injection; verify exact behavior during integration testing]
+[CONFIRMED: `$client_id` and `$client_secret` env var substitution within dex.config — Dex substitutes `$VARNAME` references in connector config with env vars injected via envFrom. The env var names come from the Secret keys (`client_id`, `client_secret`), not from any renaming. Verified via Pitfall 5 analysis and ExternalSecret key confirmation. Verify exact behavior during integration testing as a safety measure.]
 
 ### Pattern 3: ArgoCD RBAC Configuration
 
@@ -739,7 +739,7 @@ Step 2.6: SKIPPED — This phase is configuration-only (filling YAML values and 
 - kubernetes-sigs/metrics-server README — `--kubelet-insecure-tls` and `--kubelet-preferred-address-types` flags for private clusters
 
 ### Tertiary (LOW confidence)
-- `$client_id` env var name in dex.config when using envFrom (not explicitly documented; inferred from Dex env var substitution behavior + ExternalSecret key names)
+- `$client_id` env var name in dex.config when using envFrom (inferred from Dex env var substitution behavior + ExternalSecret key names; corroborated by Pitfall 5 analysis confirming `$GITHUB_CLIENT_ID` does NOT work)
 
 ---
 
@@ -751,7 +751,7 @@ Step 2.6: SKIPPED — This phase is configuration-only (filling YAML values and 
 - Envoy Gateway OCI LB config: HIGH — verified against OCI CCM docs and Envoy Gateway customize docs
 - cert-manager Gateway API: HIGH — verified against cert-manager official docs
 - metrics-server OKE flags: HIGH — verified against kubernetes-sigs/metrics-server README
-- Dex env var substitution pattern (A1): MEDIUM — inferred, not explicitly documented
+- Dex env var substitution pattern (A1): MEDIUM — inferred from ExternalSecret key names + confirmed Pitfall 5 analysis; verify during integration testing
 
 **Research date:** 2026-04-10
 **Valid until:** 2026-05-10 (stable APIs; cert-manager and ArgoCD release cycles are ~quarterly)

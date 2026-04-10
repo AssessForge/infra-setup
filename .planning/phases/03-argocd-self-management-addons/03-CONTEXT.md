@@ -16,10 +16,10 @@ Fill in the stub Helm values and add Gateway API / cert-manager resources so tha
 ### ArgoCD SSO & RBAC
 - **D-01:** Org-wide admin RBAC — all AssessForge GitHub org members get `role:admin`. Default policy denies access to non-members. No team-based granularity needed for a small team with a single cluster.
 - **D-02:** All security hardening values go in `environments/default/addons/argocd/values.yaml` — admin.enabled=false, exec.enabled=false, security contexts (runAsNonRoot, readOnlyRootFilesystem, drop ALL caps, seccomp), resource limits. Single source of truth, no separate manifests.
-- **D-03:** Dex GitHub connector references the OAuth credentials via environment variables (`$GITHUB_CLIENT_ID` / `$GITHUB_CLIENT_SECRET`) sourced from the `argocd-dex-github-secret` ExternalSecret. Mounted as env source on the Dex container via Helm values.
+- **D-03:** Dex GitHub connector references the OAuth credentials via environment variables (`$client_id` / `$client_secret`) sourced from the `argocd-dex-github-secret` ExternalSecret. The env var names must match the ExternalSecret `secretKey` values exactly (`client_id`, `client_secret`). Mounted as env source on the Dex container via Helm `dex.envFrom`. *(Updated: original discussion used `$GITHUB_CLIENT_ID`/`$GITHUB_CLIENT_SECRET` but research confirmed ExternalSecret keys are `client_id`/`client_secret` -- env var names must match.)*
 
 ### Envoy Gateway & Routing
-- **D-04:** OCI Load Balancer configured via Service annotations on the Envoy Gateway controller Service through Helm values — flexible shape, 10Mbps min/max bandwidth (free tier). Same pattern as the old ingress-nginx setup.
+- **D-04:** OCI Load Balancer configured via EnvoyProxy custom resource with Service annotations (`envoyService.annotations`) -- flexible shape, 10Mbps min/max bandwidth (free tier). The EnvoyProxy CR is referenced by GatewayClass via `parametersRef`. *(Updated: Helm values approach from original discussion does not apply to Envoy Gateway -- OCI LB annotations must be set on the data-plane Service, which is controlled by the EnvoyProxy CR, not the control-plane Helm values.)*
 - **D-05:** Envoy Gateway Helm chart manages its own CRDs (default chart behavior). No separate CRD Application needed. CRDs upgrade with the chart.
 - **D-06:** TLS terminates at Envoy Gateway. Plain HTTP from Gateway to ArgoCD Server on port 8080. Standard approach for internal cluster traffic — avoids ArgoCD self-signed cert complexity.
 
