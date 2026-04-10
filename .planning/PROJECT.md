@@ -29,12 +29,12 @@ After bootstrap, every cluster change — addons, ArgoCD config, workloads — f
 
 - ✓ GitOps repo created at ~/projects/AssessForge/gitops-setup — Validated in Phase 2
 - ✓ GitOps repo: ArgoCD self-managed Application (upgrades/config via PRs, prune: false) — Validated in Phase 2
-- [ ] GitOps repo: ArgoCD config via Helm values — GitHub SSO (Dex, org: AssessForge), RBAC, repo credentials — all secrets via ESO
+- ✓ GitOps repo: ArgoCD config via Helm values — GitHub SSO (Dex, org: AssessForge), RBAC, repo credentials — all secrets via ESO — Validated in Phase 3
 - ✓ GitOps repo: ApplicationSet reading Bridge Secret annotations for dynamic addon creation — Validated in Phase 2
-- [ ] GitOps repo: Envoy Gateway with Kubernetes Gateway API + OCI Load Balancer annotations
-- [ ] GitOps repo: cert-manager addon with HTTP-01 Let's Encrypt ClusterIssuer
+- ✓ GitOps repo: Envoy Gateway with Kubernetes Gateway API + OCI Load Balancer annotations — Validated in Phase 3
+- ✓ GitOps repo: cert-manager addon with HTTP-01 Let's Encrypt ClusterIssuer — Validated in Phase 3
 - ✓ GitOps repo: external-secrets-operator with ClusterSecretStore pointing to OCI Vault via Instance Principal — Validated in Phase 2
-- [ ] GitOps repo: metrics-server addon
+- ✓ GitOps repo: metrics-server addon — Validated in Phase 3
 - ✓ GitOps repo: ExternalSecret manifests for ArgoCD sensitive config (GitHub OAuth, repo creds) — Validated in Phase 2 (ESO-05 notification tokens skipped per D-08)
 - ✓ No static API keys or credentials in any Kubernetes Secret — all via Instance Principal (Dynamic Groups) or OCI Vault + ESO — Validated in Phase 2
 
@@ -78,10 +78,10 @@ After bootstrap, every cluster change — addons, ArgoCD config, workloads — f
 | Single prod environment | Only one cluster needed now; multi-env is future scope | — Pending |
 | GitOps Bridge Secret for metadata passing | Standard pattern for Terraform→ArgoCD handoff; annotations drive ApplicationSet | ✓ Phase 1 |
 | Instance Principal over static keys | Zero credential rotation burden via Dynamic Groups; Workload Identity requires paid Enhanced tier | ✓ Phase 1 |
-| Envoy Gateway over ingress-nginx | ingress-nginx archived March 2026; Envoy Gateway is modern Gateway API standard | — Pending |
-| HTTP-01 cert challenge | Simpler setup; no Cloudflare API token needed | — Pending |
-| 100% OCI Free Tier | Hard cost constraint; OKE stays BASIC, no Enhanced tier features | — Pending |
-| ArgoCD self-managed from day one | Prevents config drift; upgrades and config changes are PRs | — Pending |
+| Envoy Gateway over ingress-nginx | ingress-nginx archived March 2026; Envoy Gateway is modern Gateway API standard | ✓ Phase 3 |
+| HTTP-01 cert challenge | Simpler setup; no Cloudflare API token needed | ✓ Phase 3 |
+| 100% OCI Free Tier | Hard cost constraint; OKE stays BASIC, no Enhanced tier features | ✓ All phases |
+| ArgoCD self-managed from day one | Prevents config drift; upgrades and config changes are PRs | ✓ Phase 3 |
 
 ## Evolution
 
@@ -101,4 +101,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-10 after Phase 2 completion*
+*Last updated: 2026-04-10 after Phase 3 completion*
