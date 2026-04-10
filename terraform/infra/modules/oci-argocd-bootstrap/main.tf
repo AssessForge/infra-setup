@@ -105,6 +105,8 @@ resource "kubectl_manifest" "bootstrap_app" {
       }
       syncPolicy = {
         automated = {
+          # prune = false no root app — evita destruicao acidental durante bootstrap.
+          # Child ApplicationSets devem configurar prune = true individualmente.
           prune    = false
           selfHeal = true
         }
