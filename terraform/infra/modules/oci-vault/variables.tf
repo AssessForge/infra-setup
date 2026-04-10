@@ -15,6 +15,12 @@ variable "github_oauth_client_secret" {
   sensitive   = true
 }
 
+variable "gitops_repo_pat" {
+  description = "GitHub Personal Access Token para acesso ao repositorio gitops-setup"
+  type        = string
+  sensitive   = true
+}
+
 variable "freeform_tags" {
   description = "Tags aplicadas a todos os recursos"
   type        = map(string)

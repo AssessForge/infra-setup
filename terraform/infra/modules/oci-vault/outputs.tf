@@ -12,3 +12,9 @@ output "master_key_ocid" {
   description = "OCID da Master Key"
   value       = oci_kms_key.master.id
 }
+
+output "gitops_repo_pat_ocid" {
+  description = "OCID do secret GitHub PAT no Vault"
+  value       = oci_vault_secret.gitops_repo_pat.id
+  sensitive   = true
+}

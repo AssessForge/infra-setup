@@ -58,3 +58,19 @@ resource "oci_vault_secret" "github_oauth_client_secret" {
     # stage é read-only no OCI provider >= 6.0 — não incluir
   }
 }
+
+# Secret — GitHub PAT para acesso ao repositorio gitops-setup
+resource "oci_vault_secret" "gitops_repo_pat" {
+  compartment_id = var.compartment_ocid
+  vault_id       = oci_kms_vault.main.id
+  key_id         = oci_kms_key.master.id
+  secret_name    = "gitops-repo-pat"
+  freeform_tags  = var.freeform_tags
+
+  secret_content {
+    content_type = "BASE64"
+    content      = base64encode(var.gitops_repo_pat)
+    name         = "gitops-repo-pat"
+    # stage é read-only no OCI provider >= 6.0 — não incluir
+  }
+}
