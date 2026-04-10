@@ -48,7 +48,11 @@ Plans:
   3. ESO is deployed and healthy; ClusterSecretStore reports `Ready` connecting to OCI Vault using Instance Principal (no static API keys anywhere)
   4. ExternalSecrets for ArgoCD OAuth, repo credentials, and notification tokens sync successfully and create Kubernetes Secrets from OCI Vault
   5. All ESO manifests use `external-secrets.io/v1` API; all addon Helm chart versions are pinned
-**Plans**: TBD
+**Plans:** 3 plans
+Plans:
+- [ ] 02-01-PLAN.md — Initialize gitops-setup repo with directory scaffold, ApplicationSet, and addon Application manifests
+- [ ] 02-02-PLAN.md — Create ClusterSecretStore and ExternalSecret manifests for OCI Vault
+- [ ] 02-03-PLAN.md — Extend oci-vault Terraform module with GitHub PAT secret for repo credentials
 
 ### Phase 3: ArgoCD Self-Management & Addons
 **Goal**: ArgoCD manages its own config via the GitOps repo, GitHub SSO is active, Envoy Gateway serves external HTTPS traffic, cert-manager issues a valid Let's Encrypt certificate, and metrics-server provides resource metrics
@@ -71,5 +75,5 @@ Phases execute in numeric order: 1 → 2 → 3
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Cleanup & IAM Bootstrap | 0/2 | Not started | - |
-| 2. GitOps Repository & ESO | 0/TBD | Not started | - |
+| 2. GitOps Repository & ESO | 0/3 | Not started | - |
 | 3. ArgoCD Self-Management & Addons | 0/TBD | Not started | - |
