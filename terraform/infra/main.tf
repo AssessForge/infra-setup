@@ -65,3 +65,24 @@ module "oci_vault" {
 
   depends_on = [module.oci_oke]
 }
+
+# --- Bootstrap ArgoCD (depende de OKE + Vault) ---
+
+module "oci_argocd_bootstrap" {
+  source = "./modules/oci-argocd-bootstrap"
+
+  compartment_ocid     = var.compartment_ocid
+  region               = var.region
+  vault_ocid           = module.oci_vault.vault_ocid
+  public_subnet_id     = module.oci_network.public_subnet_id
+  private_subnet_id    = module.oci_network.private_subnet_id
+  gitops_repo_url      = var.gitops_repo_url
+  gitops_repo_revision = var.gitops_repo_revision
+  cluster_name         = var.cluster_name
+  freeform_tags        = local.freeform_tags
+
+  depends_on = [
+    module.oci_oke,
+    module.oci_vault,
+  ]
+}
