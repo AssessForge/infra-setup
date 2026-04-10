@@ -18,24 +18,25 @@ After bootstrap, every cluster change — addons, ArgoCD config, workloads — f
 - ✓ OCI Vault for secrets — existing (`terraform/infra/modules/oci-vault`)
 - ✓ OCI Cloud Guard — existing (`terraform/infra/modules/oci-cloud-guard`)
 - ✓ Terraform remote state on OCI Object Storage (S3-compatible) — existing
+- ✓ IAM Dynamic Group + Instance Principal policy for ESO → OCI Vault — Validated in Phase 1
+- ✓ ArgoCD installed via helm_release (minimal, ClusterIP, no SSO) — Validated in Phase 1
+- ✓ GitOps Bridge Secret with infra annotations and addon feature flags — Validated in Phase 1
+- ✓ Root bootstrap Application pointing to gitops-setup repo — Validated in Phase 1
+- ✓ VCN `prevent_destroy = true` — Validated in Phase 1
+- ✓ `terraform/k8s/` layer removed (never applied) — Validated in Phase 1
 
 ### Active
 
-- [ ] Terraform creates OCI Dynamic Group + IAM Policy for ArgoCD Workload Identity
-- [ ] Terraform installs ArgoCD via helm_release (minimal — no SSO, no repo config)
-- [ ] Terraform creates GitOps Bridge Secret with infra annotations (compartment OCID, subnet IDs, vault OCID, region, environment, addon feature flags)
-- [ ] Terraform creates root bootstrap Application pointing to gitops-setup repo
-- [ ] Critical resources have `prevent_destroy = true` (cluster, VCN, state bucket)
-- [ ] GitOps repo: ArgoCD self-managed Application (upgrades/config via PRs)
+- [ ] GitOps repo created at ~/projects/AssessForge/gitops-setup
+- [ ] GitOps repo: ArgoCD self-managed Application (upgrades/config via PRs, prune: false)
 - [ ] GitOps repo: ArgoCD config via Helm values — GitHub SSO (Dex, org: AssessForge), RBAC, repo credentials — all secrets via ESO
 - [ ] GitOps repo: ApplicationSet reading Bridge Secret annotations for dynamic addon creation
-- [ ] GitOps repo: ingress-nginx with OCI Load Balancer annotations
-- [ ] GitOps repo: cert-manager addon
-- [ ] GitOps repo: external-secrets-operator with ClusterSecretStore pointing to OCI Vault via Workload Identity
+- [ ] GitOps repo: Envoy Gateway with Kubernetes Gateway API + OCI Load Balancer annotations
+- [ ] GitOps repo: cert-manager addon with HTTP-01 Let's Encrypt ClusterIssuer
+- [ ] GitOps repo: external-secrets-operator with ClusterSecretStore pointing to OCI Vault via Instance Principal
 - [ ] GitOps repo: metrics-server addon
 - [ ] GitOps repo: ExternalSecret manifests for ArgoCD sensitive config (GitHub OAuth, repo creds, notification tokens)
-- [ ] Existing `terraform/k8s/` layer destroyed and removed — ArgoCD takes over
-- [ ] No static API keys or credentials in any Kubernetes Secret — all via OCI Workload Identity or OCI Vault + ESO
+- [ ] No static API keys or credentials in any Kubernetes Secret — all via Instance Principal (Dynamic Groups) or OCI Vault + ESO
 
 ### Out of Scope
 
@@ -60,9 +61,10 @@ After bootstrap, every cluster change — addons, ArgoCD config, workloads — f
 ## Constraints
 
 - **Cloud**: OCI only — all IAM, networking, and secrets use OCI-native services
-- **Identity**: OCI Workload Identity for all pod-level OCI API access — no static API keys
+- **Cost**: 100% OCI Always Free tier — never introduce paid resources
+- **Identity**: OCI Instance Principal via Dynamic Groups for pod-level OCI API access — no static API keys (Workload Identity requires Enhanced tier which is paid)
 - **Secrets**: All sensitive values in OCI Vault, pulled by External Secrets Operator
-- **Networking**: ArgoCD Server uses ClusterIP — ingress-nginx manages external access (installed via GitOps, not Terraform)
+- **Networking**: ArgoCD Server uses ClusterIP — Envoy Gateway manages external access via Gateway API (installed via GitOps, not Terraform)
 - **Versioning**: All Helm chart versions and Terraform provider versions must be pinned — no `latest` or open ranges
 - **State**: Terraform remote state on OCI Object Storage (S3-compatible backend)
 - **Protection**: Critical resources (cluster, VCN, state bucket) must have `prevent_destroy = true`
@@ -72,10 +74,13 @@ After bootstrap, every cluster change — addons, ArgoCD config, workloads — f
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Destroy existing `terraform/k8s/` layer | Clean break — ArgoCD adopts resources fresh rather than complex state migration | — Pending |
+| Destroy existing `terraform/k8s/` layer | Clean break — ArgoCD adopts resources fresh rather than complex state migration | ✓ Phase 1 |
 | Single prod environment | Only one cluster needed now; multi-env is future scope | — Pending |
-| GitOps Bridge Secret for metadata passing | Standard pattern for Terraform→ArgoCD handoff; annotations drive ApplicationSet | — Pending |
-| OCI Workload Identity over static keys | Zero credential rotation burden, no secrets in cluster | — Pending |
+| GitOps Bridge Secret for metadata passing | Standard pattern for Terraform→ArgoCD handoff; annotations drive ApplicationSet | ✓ Phase 1 |
+| Instance Principal over static keys | Zero credential rotation burden via Dynamic Groups; Workload Identity requires paid Enhanced tier | ✓ Phase 1 |
+| Envoy Gateway over ingress-nginx | ingress-nginx archived March 2026; Envoy Gateway is modern Gateway API standard | — Pending |
+| HTTP-01 cert challenge | Simpler setup; no Cloudflare API token needed | — Pending |
+| 100% OCI Free Tier | Hard cost constraint; OKE stays BASIC, no Enhanced tier features | — Pending |
 | ArgoCD self-managed from day one | Prevents config drift; upgrades and config changes are PRs | — Pending |
 
 ## Evolution
@@ -96,4 +101,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-09 after initialization*
+*Last updated: 2026-04-10 after Phase 1 completion*
