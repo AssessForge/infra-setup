@@ -5,6 +5,10 @@ resource "oci_core_vcn" "main" {
   display_name   = "assessforge-vcn"
   dns_label      = "assessforge"
   freeform_tags  = var.freeform_tags
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 # Internet Gateway (subnet pública)

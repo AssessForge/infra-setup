@@ -41,3 +41,15 @@ variable "github_oauth_client_secret" {
   type        = string
   sensitive   = true
 }
+
+variable "gitops_repo_url" {
+  description = "URL do repositorio GitOps (gitops-setup)"
+  type        = string
+  default     = "https://github.com/AssessForge/gitops-setup"
+}
+
+variable "gitops_repo_revision" {
+  description = "Branch/revision do repositorio GitOps"
+  type        = string
+  default     = "main"
+}

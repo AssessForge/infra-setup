@@ -6,6 +6,18 @@ terraform {
       source  = "oracle/oci"
       version = "~> 8.0"
     }
+    helm = {
+      source  = "hashicorp/helm"
+      version = "~> 3.0"
+    }
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = "~> 3.0"
+    }
+    kubectl = {
+      source  = "alekc/kubectl"
+      version = "~> 2.0"
+    }
   }
 
   backend "s3" {
@@ -24,4 +36,19 @@ provider "oci" {
   region = var.region
   # Autentica via ~/.oci/config perfil DEFAULT
   # Não hardcodar user_ocid, fingerprint ou private_key_path aqui
+}
+
+provider "helm" {
+  kubernetes = {
+    config_path = pathexpand("~/.kube/config-assessforge")
+  }
+}
+
+provider "kubernetes" {
+  config_path = pathexpand("~/.kube/config-assessforge")
+}
+
+provider "kubectl" {
+  config_path      = pathexpand("~/.kube/config-assessforge")
+  load_config_file = true
 }

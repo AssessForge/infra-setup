@@ -1,29 +1,33 @@
-# Dynamic Group para Workload Identity do ESO
-resource "oci_identity_dynamic_group" "workload_identity" {
+# Dynamic Group para Instance Principal dos worker nodes OKE
+resource "oci_identity_dynamic_group" "instance_principal" {
   compartment_id = var.tenancy_ocid # Dynamic groups vivem no tenancy root
-  name           = "assessforge-workload-identity"
-  description    = "Dynamic group para External Secrets Operator via Workload Identity"
+  name           = "assessforge-instance-principal"
+  description    = "Dynamic group para worker nodes OKE via Instance Principal (BASIC tier)"
   freeform_tags  = var.freeform_tags
 
-  # resource.type = 'workload' restringe ao Workload Identity de pods OKE via OIDC,
-  # evitando que qualquer compute instance do compartment assuma este grupo.
-  matching_rule = "ALL {resource.type = 'workload', resource.compartment.id = '${var.compartment_ocid}'}"
+  # resource.type = 'instance' com instance.compartment.id restringe ao compartment especifico,
+  # evitando que instancias de outros compartments assumam este grupo.
+  matching_rule = "ALL {resource.type = 'instance', instance.compartment.id = '${var.compartment_ocid}'}"
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
-# Policy — ESO pode ler secrets do Vault
-resource "oci_identity_policy" "eso_vault_access" {
+# Policy — worker nodes podem ler secrets do Vault via Instance Principal
+resource "oci_identity_policy" "instance_principal_vault" {
   compartment_id = var.compartment_ocid
-  name           = "assessforge-eso-vault-policy"
-  description    = "Permite ao ESO ler secrets do OCI Vault via Workload Identity"
+  name           = "assessforge-instance-principal-vault-policy"
+  description    = "Permite aos worker nodes OKE ler secrets do OCI Vault via Instance Principal"
   freeform_tags  = var.freeform_tags
 
   statements = [
-    "Allow dynamic-group ${oci_identity_dynamic_group.workload_identity.name} to read secret-family in compartment id ${var.compartment_ocid}",
-    "Allow dynamic-group ${oci_identity_dynamic_group.workload_identity.name} to use vaults in compartment id ${var.compartment_ocid}",
-    "Allow dynamic-group ${oci_identity_dynamic_group.workload_identity.name} to use keys in compartment id ${var.compartment_ocid}",
+    "Allow dynamic-group ${oci_identity_dynamic_group.instance_principal.name} to read secret-family in compartment id ${var.compartment_ocid}",
+    "Allow dynamic-group ${oci_identity_dynamic_group.instance_principal.name} to use vaults in compartment id ${var.compartment_ocid}",
+    "Allow dynamic-group ${oci_identity_dynamic_group.instance_principal.name} to use keys in compartment id ${var.compartment_ocid}",
   ]
 
-  depends_on = [oci_identity_dynamic_group.workload_identity]
+  depends_on = [oci_identity_dynamic_group.instance_principal]
 }
 
 # Policy — OKE pode gerenciar recursos de rede para criar Load Balancers
