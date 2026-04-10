@@ -50,9 +50,9 @@ Plans:
   5. All ESO manifests use `external-secrets.io/v1` API; all addon Helm chart versions are pinned
 **Plans:** 3 plans
 Plans:
-- [ ] 02-01-PLAN.md — Initialize gitops-setup repo with directory scaffold, ApplicationSet, and addon Application manifests
-- [ ] 02-02-PLAN.md — Create ClusterSecretStore and ExternalSecret manifests for OCI Vault
-- [ ] 02-03-PLAN.md — Extend oci-vault Terraform module with GitHub PAT secret for repo credentials
+- [x] 02-01-PLAN.md — Initialize gitops-setup repo with directory scaffold, ApplicationSet, and addon Application manifests
+- [x] 02-02-PLAN.md — Create ClusterSecretStore and ExternalSecret manifests for OCI Vault
+- [x] 02-03-PLAN.md — Extend oci-vault Terraform module with GitHub PAT secret for repo credentials
 
 ### Phase 3: ArgoCD Self-Management & Addons
 **Goal**: ArgoCD manages its own config via the GitOps repo, GitHub SSO is active, Envoy Gateway serves external HTTPS traffic, cert-manager issues a valid Let's Encrypt certificate, and metrics-server provides resource metrics
