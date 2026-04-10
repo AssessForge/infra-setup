@@ -35,8 +35,8 @@ Decimal phases appear between their surrounding integers in numeric order.
   5. Root bootstrap ArgoCD Application resource exists and points at the gitops-setup repo; all provider and Helm chart versions are pinned
 **Plans:** 2 plans
 Plans:
-- [ ] 01-01-PLAN.md — Cleanup k8s directory, fix IAM Dynamic Group, add providers/variables/outputs
-- [ ] 01-02-PLAN.md — Create oci-argocd-bootstrap module and wire into root main.tf
+- [x] 01-01-PLAN.md — Cleanup k8s directory, fix IAM Dynamic Group, add providers/variables/outputs
+- [x] 01-02-PLAN.md — Create oci-argocd-bootstrap module and wire into root main.tf
 
 ### Phase 2: GitOps Repository & ESO
 **Goal**: The gitops-setup repository exists with the correct directory structure, ApplicationSet reads the Bridge Secret to create addon Applications, and External Secrets Operator is deployed and connected to OCI Vault via Instance Principal
