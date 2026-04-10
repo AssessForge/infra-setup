@@ -110,7 +110,7 @@ ESO uses Instance Principal auth (not OKE Workload Identity, which requires Enha
 | `argo-cd` | `https://argoproj.github.io/argo-helm` |
 | `cert-manager` | `https://charts.jetstack.io` |
 | `metrics-server` | `https://kubernetes-sigs.github.io/metrics-server/` |
-| `envoy-gateway` | `https://charts.envoyproxy.io` [ASSUMED — verify before Phase 3] |
+| `gateway-helm` | `oci://docker.io/envoyproxy` [VERIFIED — OCI registry; no HTTPS Helm repo exists] |
 
 ---
 
@@ -646,29 +646,32 @@ find . -type d -empty -exec touch {}/.gitkeep \;
 
 | # | Claim | Section | Risk if Wrong |
 |---|-------|---------|---------------|
-| A1 | Envoy Gateway Helm chart version is `1.4.0` from `https://charts.envoyproxy.io` | Standard Stack | Phase 3 stub Application will have wrong chart version; low risk in Phase 2 since stub has no values |
+| A1 | Envoy Gateway Helm chart version is `1.4.0` from `oci://docker.io/envoyproxy` (chart name: `gateway-helm`) | Standard Stack | Phase 3 stub Application will have wrong chart version; low risk in Phase 2 since stub has no values |
 | A2 | The single matrix ApplicationSet (D-04) with convention-based filtering (D-05) will produce Applications for ALL discovered addon directories regardless of Bridge Secret feature flags — feature gating requires either dir presence control or per-addon AppSets | Architecture Patterns Pattern 1 | If false, a simpler filtering approach exists; if true, Phase 3 may need to revisit gating |
 | A3 | `clusters/in-cluster/addons/eso/values.yaml` is the correct place to inject vault OCID for ESO (rather than ApplicationSet Helm parameter override) for Phase 2 simplicity | Architecture Patterns Pattern 4 | If wrong approach, vault OCID won't reach ESO Helm values; ClusterSecretStore will have wrong OCID |
 | A4 | ArgoCD recognizes `argocd-repo-creds` by watching for `argocd.argoproj.io/secret-type: repo-creds` label on K8s Secrets in the `argocd` namespace | Common Pitfalls Pitfall 6 | Repo cloning will fail silently; ArgoCD won't use the secret as credentials |
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Single AppSet feature gating behavior**
    - What we know: D-04 commits to a single matrix ApplicationSet; D-05 commits to convention-based dir-to-label mapping
    - What's unclear: Does the matrix ApplicationSet create Applications for ALL discovered directories (including disabled addons), or can `matchExpressions` on the cluster generator filter by a label that matches the dir basename?
    - Recommendation: Plan should document that ALL stubbed addon dirs will generate Applications; stub Applications with empty Helm values are harmless in Phase 2. Address proper gating in Phase 3 if needed.
+   - **RESOLVED:** Plans adopt this recommendation. All dirs generate Applications; gating deferred to Phase 3.
 
 2. **ArgoCD repo-creds secret exact format**
    - What we know: ArgoCD uses secrets labeled `argocd.argoproj.io/secret-type: repo-creds` for credential templates
    - What's unclear: Whether `url`, `username`, `password` are the exact required keys or if `type: git` is also needed
    - Recommendation: Plan should include a verification step — after ESO syncs the secret, run `argocd repo list` to confirm ArgoCD picks it up.
+   - **RESOLVED:** Plan 02-02 uses target.template with type/url/username/password keys and `argocd.argoproj.io/secret-type: repo-creds` label. Runtime verification deferred to Phase 3 deployment.
 
 3. **gitops-setup repo visibility (public vs private)**
    - What we know: ArgoCD repo-creds with PAT are needed for private repos
    - What's unclear: Will the repo be public (no creds needed for read) or private (PAT required)?
    - Recommendation: Create as private; use PAT credentials. Lower risk than public for a GitOps control-plane repo. The ESO-04 ExternalSecret for repo creds is required either way per REQUIREMENTS.md.
+   - **RESOLVED:** Private repo + PAT. Plan 02-03 adds PAT to OCI Vault; Plan 02-02 creates ExternalSecret for repo-creds.
 
 ---
 
