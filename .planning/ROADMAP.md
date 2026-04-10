@@ -67,9 +67,9 @@ Plans:
 **UI hint**: yes
 **Plans:** 3 plans
 Plans:
-- [ ] 03-01-PLAN.md — ArgoCD self-management with GitHub SSO, RBAC, and security hardening
-- [ ] 03-02-PLAN.md — Envoy Gateway routing with OCI LB and Gateway API resources
-- [ ] 03-03-PLAN.md — cert-manager TLS with Let's Encrypt and metrics-server for OKE
+- [x] 03-01-PLAN.md — ArgoCD self-management with GitHub SSO, RBAC, and security hardening
+- [x] 03-02-PLAN.md — Envoy Gateway routing with OCI LB and Gateway API resources
+- [x] 03-03-PLAN.md — cert-manager TLS with Let's Encrypt and metrics-server for OKE
 
 ## Progress
 
