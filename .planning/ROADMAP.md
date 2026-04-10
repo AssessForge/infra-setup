@@ -33,7 +33,10 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. `terraform apply` completes with ArgoCD running in the cluster (ClusterIP service, no SSO configured yet)
   4. GitOps Bridge Secret exists in the argocd namespace with all required labels (addon feature flags) and annotations (compartment OCID, subnet IDs, vault OCID, region, environment)
   5. Root bootstrap ArgoCD Application resource exists and points at the gitops-setup repo; all provider and Helm chart versions are pinned
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 01-01-PLAN.md — Cleanup k8s directory, fix IAM Dynamic Group, add providers/variables/outputs
+- [ ] 01-02-PLAN.md — Create oci-argocd-bootstrap module and wire into root main.tf
 
 ### Phase 2: GitOps Repository & ESO
 **Goal**: The gitops-setup repository exists with the correct directory structure, ApplicationSet reads the Bridge Secret to create addon Applications, and External Secrets Operator is deployed and connected to OCI Vault via Instance Principal
@@ -67,6 +70,6 @@ Phases execute in numeric order: 1 → 2 → 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Cleanup & IAM Bootstrap | 0/TBD | Not started | - |
+| 1. Cleanup & IAM Bootstrap | 0/2 | Not started | - |
 | 2. GitOps Repository & ESO | 0/TBD | Not started | - |
 | 3. ArgoCD Self-Management & Addons | 0/TBD | Not started | - |
