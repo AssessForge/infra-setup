@@ -27,16 +27,16 @@ After bootstrap, every cluster change — addons, ArgoCD config, workloads — f
 
 ### Active
 
-- [ ] GitOps repo created at ~/projects/AssessForge/gitops-setup
-- [ ] GitOps repo: ArgoCD self-managed Application (upgrades/config via PRs, prune: false)
+- ✓ GitOps repo created at ~/projects/AssessForge/gitops-setup — Validated in Phase 2
+- ✓ GitOps repo: ArgoCD self-managed Application (upgrades/config via PRs, prune: false) — Validated in Phase 2
 - [ ] GitOps repo: ArgoCD config via Helm values — GitHub SSO (Dex, org: AssessForge), RBAC, repo credentials — all secrets via ESO
-- [ ] GitOps repo: ApplicationSet reading Bridge Secret annotations for dynamic addon creation
+- ✓ GitOps repo: ApplicationSet reading Bridge Secret annotations for dynamic addon creation — Validated in Phase 2
 - [ ] GitOps repo: Envoy Gateway with Kubernetes Gateway API + OCI Load Balancer annotations
 - [ ] GitOps repo: cert-manager addon with HTTP-01 Let's Encrypt ClusterIssuer
-- [ ] GitOps repo: external-secrets-operator with ClusterSecretStore pointing to OCI Vault via Instance Principal
+- ✓ GitOps repo: external-secrets-operator with ClusterSecretStore pointing to OCI Vault via Instance Principal — Validated in Phase 2
 - [ ] GitOps repo: metrics-server addon
-- [ ] GitOps repo: ExternalSecret manifests for ArgoCD sensitive config (GitHub OAuth, repo creds, notification tokens)
-- [ ] No static API keys or credentials in any Kubernetes Secret — all via Instance Principal (Dynamic Groups) or OCI Vault + ESO
+- ✓ GitOps repo: ExternalSecret manifests for ArgoCD sensitive config (GitHub OAuth, repo creds) — Validated in Phase 2 (ESO-05 notification tokens skipped per D-08)
+- ✓ No static API keys or credentials in any Kubernetes Secret — all via Instance Principal (Dynamic Groups) or OCI Vault + ESO — Validated in Phase 2
 
 ### Out of Scope
 
@@ -101,4 +101,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-10 after Phase 1 completion*
+*Last updated: 2026-04-10 after Phase 2 completion*
