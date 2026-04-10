@@ -6,6 +6,7 @@ resource "oci_cloud_guard_cloud_guard_configuration" "main" {
 }
 
 # Data source: Oracle Managed Detector Recipe
+# depends_on garante leitura apos Cloud Guard ser habilitado (nao durante plan)
 data "oci_cloud_guard_detector_recipes" "oracle_managed" {
   compartment_id = var.tenancy_ocid
 
@@ -14,6 +15,8 @@ data "oci_cloud_guard_detector_recipes" "oracle_managed" {
     values = ["OCI Configuration Detector Recipe"]
     regex  = false
   }
+
+  depends_on = [oci_cloud_guard_cloud_guard_configuration.main]
 }
 
 # Detector Recipe clonado do Oracle Managed
@@ -27,6 +30,7 @@ resource "oci_cloud_guard_detector_recipe" "assessforge" {
 }
 
 # Data source: Oracle Managed Responder Recipe
+# depends_on garante leitura apos Cloud Guard ser habilitado (nao durante plan)
 data "oci_cloud_guard_responder_recipes" "oracle_managed" {
   compartment_id = var.tenancy_ocid
 
@@ -35,6 +39,8 @@ data "oci_cloud_guard_responder_recipes" "oracle_managed" {
     values = ["OCI Notification Responder Recipe"]
     regex  = false
   }
+
+  depends_on = [oci_cloud_guard_cloud_guard_configuration.main]
 }
 
 # Responder Recipe clonado

@@ -265,8 +265,8 @@ resource "oci_logging_log_group" "vcn_flow_logs" {
   freeform_tags  = var.freeform_tags
 }
 
-resource "oci_logging_log" "vcn_flow_log" {
-  display_name  = "assessforge-vcn-flow-log"
+resource "oci_logging_log" "flow_log_public" {
+  display_name  = "assessforge-flow-log-public"
   log_group_id  = oci_logging_log_group.vcn_flow_logs.id
   log_type      = "SERVICE"
   freeform_tags = var.freeform_tags
@@ -274,7 +274,27 @@ resource "oci_logging_log" "vcn_flow_log" {
   configuration {
     source {
       category    = "all"
-      resource    = oci_core_vcn.main.id
+      resource    = oci_core_subnet.public.id
+      service     = "flowlogs"
+      source_type = "OCISERVICE"
+    }
+    compartment_id = var.compartment_ocid
+  }
+
+  is_enabled         = true
+  retention_duration = 90
+}
+
+resource "oci_logging_log" "flow_log_private" {
+  display_name  = "assessforge-flow-log-private"
+  log_group_id  = oci_logging_log_group.vcn_flow_logs.id
+  log_type      = "SERVICE"
+  freeform_tags = var.freeform_tags
+
+  configuration {
+    source {
+      category    = "all"
+      resource    = oci_core_subnet.private.id
       service     = "flowlogs"
       source_type = "OCISERVICE"
     }

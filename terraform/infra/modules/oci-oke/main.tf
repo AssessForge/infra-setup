@@ -15,12 +15,13 @@ locals {
   )[0]
 }
 
-# Log group para audit logs do OKE
-resource "oci_logging_log_group" "oke_audit" {
-  compartment_id = var.compartment_ocid
-  display_name   = "assessforge-oke-audit-logs"
-  freeform_tags  = var.freeform_tags
-}
+# TODO: OKE audit log — service name desconhecido no Terraform.
+# Habilitar manualmente pelo Console OCI: Logging > Service Logs > Container Engine for Kubernetes
+# resource "oci_logging_log_group" "oke_audit" {
+#   compartment_id = var.compartment_ocid
+#   display_name   = "assessforge-oke-audit-logs"
+#   freeform_tags  = var.freeform_tags
+# }
 
 # Cluster OKE BASIC
 resource "oci_containerengine_cluster" "main" {
@@ -56,36 +57,40 @@ resource "oci_containerengine_cluster" "main" {
   }
 }
 
-resource "oci_logging_log" "oke_audit" {
-  display_name  = "assessforge-oke-audit"
-  log_group_id  = oci_logging_log_group.oke_audit.id
-  log_type      = "SERVICE"
-  freeform_tags = var.freeform_tags
+# resource "oci_logging_log" "oke_audit" {
+#   display_name  = "assessforge-oke-audit"
+#   log_group_id  = oci_logging_log_group.oke_audit.id
+#   log_type      = "SERVICE"
+#   freeform_tags = var.freeform_tags
+#
+#   configuration {
+#     source {
+#       category    = "all"
+#       resource    = oci_containerengine_cluster.main.id
+#       service     = "???"
+#       source_type = "OCISERVICE"
+#     }
+#     compartment_id = var.compartment_ocid
+#   }
+#
+#   is_enabled         = true
+#   retention_duration = 90
+#
+#   depends_on = [oci_containerengine_cluster.main]
+# }
 
-  configuration {
-    source {
-      category    = "kube-apiserver-audit"
-      resource    = oci_containerengine_cluster.main.id
-      service     = "oke"
-      source_type = "OCISERVICE"
-    }
-    compartment_id = var.compartment_ocid
-  }
-
-  is_enabled         = true
-  retention_duration = 90
-
-  depends_on = [oci_containerengine_cluster.main]
+# Imagens OKE-validas para o cluster
+data "oci_containerengine_node_pool_option" "images" {
+  node_pool_option_id = oci_containerengine_cluster.main.id
+  compartment_id      = var.compartment_ocid
 }
 
-# Image Oracle Linux mais recente para A1
-data "oci_core_images" "oracle_linux_a1" {
-  compartment_id   = var.compartment_ocid
-  operating_system = "Oracle Linux"
-  shape            = "VM.Standard.A1.Flex"
-  sort_by          = "TIMECREATED"
-  sort_order       = "DESC"
-  state            = "AVAILABLE"
+locals {
+  # Filtra imagens aarch64 (ARM) para shape A1
+  arm_images = [
+    for s in data.oci_containerengine_node_pool_option.images.sources :
+    s if length(regexall("aarch64", s.source_name)) > 0
+  ]
 }
 
 data "oci_identity_availability_domains" "ads" {
@@ -108,7 +113,7 @@ resource "oci_containerengine_node_pool" "main" {
   }
 
   node_source_details {
-    image_id                = data.oci_core_images.oracle_linux_a1.images[0].id
+    image_id                = local.arm_images[0].image_id
     source_type             = "IMAGE"
     boot_volume_size_in_gbs = 50
   }

@@ -34,7 +34,7 @@ resource "helm_release" "argocd" {
 
 # --- GitOps Bridge Secret ---
 
-resource "kubernetes_secret" "gitops_bridge" {
+resource "kubernetes_secret_v1" "gitops_bridge" {
   metadata {
     name      = "in-cluster"
     namespace = helm_release.argocd.namespace
@@ -115,6 +115,6 @@ resource "kubectl_manifest" "bootstrap_app" {
 
   depends_on = [
     helm_release.argocd,
-    kubernetes_secret.gitops_bridge,
+    kubernetes_secret_v1.gitops_bridge,
   ]
 }
