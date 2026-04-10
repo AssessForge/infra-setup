@@ -125,8 +125,8 @@ resource "oci_core_network_security_group_security_rule" "lb_egress_workers" {
   network_security_group_id = oci_core_network_security_group.lb.id
   direction                 = "EGRESS"
   protocol                  = "6" # TCP
-  destination               = var.private_subnet_cidr
-  destination_type          = "CIDR_BLOCK"
+  destination               = oci_core_network_security_group.workers.id
+  destination_type          = "NETWORK_SECURITY_GROUP"
 
   tcp_options {
     destination_port_range {
