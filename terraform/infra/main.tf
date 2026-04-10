@@ -24,6 +24,7 @@ module "oci_iam" {
 
 module "oci_cloud_guard" {
   source = "./modules/oci-cloud-guard"
+  count  = var.enable_cloud_guard ? 1 : 0
 
   tenancy_ocid       = var.tenancy_ocid
   compartment_ocid   = var.compartment_ocid
@@ -61,6 +62,7 @@ module "oci_vault" {
   compartment_ocid           = var.compartment_ocid
   github_oauth_client_id     = var.github_oauth_client_id
   github_oauth_client_secret = var.github_oauth_client_secret
+  gitops_repo_pat            = var.gitops_repo_pat
   freeform_tags              = local.freeform_tags
 
   depends_on = [module.oci_oke]

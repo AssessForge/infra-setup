@@ -20,15 +20,11 @@ terraform {
     }
   }
 
-  backend "s3" {
-    bucket                      = "assessforge-tfstate"
-    key                         = "infra/terraform.tfstate"
-    region                      = "sa-saopaulo-1"
-    endpoint                    = "https://PLACEHOLDER.compat.objectstorage.sa-saopaulo-1.oraclecloud.com"
-    skip_region_validation      = true
-    skip_credentials_validation = true
-    skip_metadata_api_check     = true
-    force_path_style            = true
+  backend "oci" {
+    bucket    = "assessforge-tfstate"
+    key       = "infra/terraform.tfstate"
+    region    = "sa-saopaulo-1"
+    namespace = "grzav3wfvr8v"
   }
 }
 
@@ -38,17 +34,24 @@ provider "oci" {
   # Não hardcodar user_ocid, fingerprint ou private_key_path aqui
 }
 
+locals {
+  kubeconfig_path   = pathexpand("~/.kube/config-assessforge")
+  kubeconfig_exists = fileexists(pathexpand("~/.kube/config-assessforge"))
+}
+
+# Fase 1 (cluster nao existe): config_path = null, providers inicializam sem conectar
+# Fase 2 (apos kubeconfig gerado): config_path aponta para o arquivo e conectam normalmente
 provider "helm" {
   kubernetes = {
-    config_path = pathexpand("~/.kube/config-assessforge")
+    config_path = local.kubeconfig_exists ? local.kubeconfig_path : null
   }
 }
 
 provider "kubernetes" {
-  config_path = pathexpand("~/.kube/config-assessforge")
+  config_path = local.kubeconfig_exists ? local.kubeconfig_path : null
 }
 
 provider "kubectl" {
-  config_path      = pathexpand("~/.kube/config-assessforge")
-  load_config_file = true
+  config_path      = local.kubeconfig_exists ? local.kubeconfig_path : null
+  load_config_file = local.kubeconfig_exists
 }

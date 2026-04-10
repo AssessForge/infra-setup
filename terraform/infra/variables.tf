@@ -30,6 +30,12 @@ variable "notification_email" {
   default     = ""
 }
 
+variable "enable_cloud_guard" {
+  description = "Habilitar Cloud Guard (requer tenancy pago — nao disponivel no Free Tier)"
+  type        = bool
+  default     = false
+}
+
 variable "github_oauth_client_id" {
   description = "Client ID do GitHub OAuth App"
   type        = string
@@ -52,4 +58,10 @@ variable "gitops_repo_revision" {
   description = "Branch/revision do repositorio GitOps"
   type        = string
   default     = "main"
+}
+
+variable "gitops_repo_pat" {
+  description = "GitHub Personal Access Token para acesso ao repositorio gitops-setup"
+  type        = string
+  sensitive   = true
 }
