@@ -24,9 +24,8 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Migration
 
-- [ ] **MIG-01**: Existing `terraform/k8s/` layer is destroyed cleanly (state removed, resources deleted from cluster)
+- [ ] **MIG-01**: The `terraform/k8s/` directory and all its modules are removed from the repository (code-only removal — these resources were never applied to the cluster)
 - [ ] **MIG-02**: Old k8s modules (argocd, external-secrets, ingress-nginx, kyverno, network-policies) are removed from the repository
-- [ ] **MIG-03**: OCI Flexible Load Balancer is released during destroy so it's available for Envoy Gateway
 
 ### GitOps Repository
 
@@ -112,6 +111,7 @@ Explicitly excluded. Documented to prevent scope creep.
 | ArgoCD exec (terminal in UI) | Security risk — use kubectl via Bastion |
 | ingress-nginx | Archived March 2026, no security patches — replaced by Envoy Gateway |
 | Any paid OCI resource | Hard constraint — 100% Always Free tier |
+| terraform destroy for old k8s layer | The `terraform/k8s/` code was never applied — no live resources exist to destroy |
 
 ## Traceability
 
@@ -119,50 +119,49 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| IAM-01 | TBD | Pending |
-| IAM-02 | TBD | Pending |
-| IAM-03 | TBD | Pending |
-| IAM-04 | TBD | Pending |
-| BOOT-01 | TBD | Pending |
-| BOOT-02 | TBD | Pending |
-| BOOT-03 | TBD | Pending |
-| BOOT-04 | TBD | Pending |
-| BOOT-05 | TBD | Pending |
-| MIG-01 | TBD | Pending |
-| MIG-02 | TBD | Pending |
-| MIG-03 | TBD | Pending |
-| REPO-01 | TBD | Pending |
-| REPO-02 | TBD | Pending |
-| REPO-03 | TBD | Pending |
-| REPO-04 | TBD | Pending |
-| ARGO-01 | TBD | Pending |
-| ARGO-02 | TBD | Pending |
-| ARGO-03 | TBD | Pending |
-| ARGO-04 | TBD | Pending |
-| ARGO-05 | TBD | Pending |
-| ESO-01 | TBD | Pending |
-| ESO-02 | TBD | Pending |
-| ESO-03 | TBD | Pending |
-| ESO-04 | TBD | Pending |
-| ESO-05 | TBD | Pending |
-| ESO-06 | TBD | Pending |
-| GW-01 | TBD | Pending |
-| GW-02 | TBD | Pending |
-| GW-03 | TBD | Pending |
-| GW-04 | TBD | Pending |
-| GW-05 | TBD | Pending |
-| CERT-01 | TBD | Pending |
-| CERT-02 | TBD | Pending |
-| CERT-03 | TBD | Pending |
-| CERT-04 | TBD | Pending |
-| MS-01 | TBD | Pending |
-| MS-02 | TBD | Pending |
+| MIG-01 | Phase 1 | Pending |
+| MIG-02 | Phase 1 | Pending |
+| IAM-01 | Phase 1 | Pending |
+| IAM-02 | Phase 1 | Pending |
+| IAM-03 | Phase 1 | Pending |
+| IAM-04 | Phase 1 | Pending |
+| BOOT-01 | Phase 1 | Pending |
+| BOOT-02 | Phase 1 | Pending |
+| BOOT-03 | Phase 1 | Pending |
+| BOOT-04 | Phase 1 | Pending |
+| BOOT-05 | Phase 1 | Pending |
+| REPO-01 | Phase 2 | Pending |
+| REPO-02 | Phase 2 | Pending |
+| REPO-03 | Phase 2 | Pending |
+| REPO-04 | Phase 2 | Pending |
+| ESO-01 | Phase 2 | Pending |
+| ESO-02 | Phase 2 | Pending |
+| ESO-03 | Phase 2 | Pending |
+| ESO-04 | Phase 2 | Pending |
+| ESO-05 | Phase 2 | Pending |
+| ESO-06 | Phase 2 | Pending |
+| ARGO-01 | Phase 3 | Pending |
+| ARGO-02 | Phase 3 | Pending |
+| ARGO-03 | Phase 3 | Pending |
+| ARGO-04 | Phase 3 | Pending |
+| ARGO-05 | Phase 3 | Pending |
+| GW-01 | Phase 3 | Pending |
+| GW-02 | Phase 3 | Pending |
+| GW-03 | Phase 3 | Pending |
+| GW-04 | Phase 3 | Pending |
+| GW-05 | Phase 3 | Pending |
+| CERT-01 | Phase 3 | Pending |
+| CERT-02 | Phase 3 | Pending |
+| CERT-03 | Phase 3 | Pending |
+| CERT-04 | Phase 3 | Pending |
+| MS-01 | Phase 3 | Pending |
+| MS-02 | Phase 3 | Pending |
 
 **Coverage:**
-- v1 requirements: 37 total
-- Mapped to phases: 0
-- Unmapped: 37 ⚠️
+- v1 requirements: 36 total (MIG-03 removed — no live LB to release)
+- Mapped to phases: 36
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-04-09*
-*Last updated: 2026-04-09 after initial definition*
+*Last updated: 2026-04-09 — MIG-01 updated (code removal, not destroy); MIG-03 removed (no live resources); Phase 1 merged into former Phase 2; renumbered to 3 phases*
