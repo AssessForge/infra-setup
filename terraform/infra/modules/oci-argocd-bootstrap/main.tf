@@ -26,9 +26,10 @@ resource "helm_release" "argocd" {
     })
   ]
 
-  # OBRIGATORIO: impede Terraform de conflitar com ArgoCD self-management
+  # ArgoCD gerencia seus proprios valores apos bootstrap — ignorar mudancas de values
+  # para evitar conflito com self-management. Para upgrade de versao, fazer taint manual.
   lifecycle {
-    ignore_changes = all
+    ignore_changes = [values]
   }
 }
 
