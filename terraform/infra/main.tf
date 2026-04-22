@@ -33,6 +33,16 @@ module "oci_cloud_guard" {
   freeform_tags      = local.freeform_tags
 }
 
+module "oci_billing_alarm" {
+  source = "./modules/oci-billing-alarm"
+  count  = var.enable_billing_alarm ? 1 : 0
+
+  tenancy_ocid       = var.tenancy_ocid
+  compartment_ocid   = var.compartment_ocid
+  notification_email = var.notification_email
+  freeform_tags      = local.freeform_tags
+}
+
 # --- OKE (depende de network + iam) ---
 
 module "oci_oke" {

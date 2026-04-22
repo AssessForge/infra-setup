@@ -21,3 +21,6 @@ notification_email = ""
 # NUNCA commitar estes valores
 github_oauth_client_id     = "Ov23liXXXXXXXXXXXX"
 github_oauth_client_secret = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+# Alarme de billing — alerta por email quando qualquer custo OCI for maior que zero
+enable_billing_alarm = false

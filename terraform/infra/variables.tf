@@ -65,3 +65,9 @@ variable "gitops_repo_pat" {
   type        = string
   sensitive   = true
 }
+
+variable "enable_billing_alarm" {
+  description = "Habilitar alarme de billing que alerta quando qualquer custo for maior que zero"
+  type        = bool
+  default     = false
+}
