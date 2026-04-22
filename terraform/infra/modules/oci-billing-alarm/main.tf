@@ -15,15 +15,15 @@ resource "oci_ons_notification_topic" "billing" {
   freeform_tags  = var.freeform_tags
 }
 
-# --- Subscription por email (condicional) ---
+# --- Uma subscription por email na lista ---
 
 resource "oci_ons_subscription" "billing_email" {
-  count = var.notification_email != "" ? 1 : 0
+  for_each = toset(var.notification_emails)
 
   compartment_id = var.compartment_ocid
   topic_id       = oci_ons_notification_topic.billing.id
   protocol       = "EMAIL"
-  endpoint       = var.notification_email
+  endpoint       = each.value
   freeform_tags  = var.freeform_tags
 }
 

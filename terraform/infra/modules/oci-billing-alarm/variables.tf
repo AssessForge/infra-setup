@@ -8,10 +8,10 @@ variable "tenancy_ocid" {
   type        = string
 }
 
-variable "notification_email" {
-  description = "Email para receber alertas de billing via OCI Notifications. Deixe vazio para nao criar subscription."
-  type        = string
-  default     = ""
+variable "notification_emails" {
+  description = "Lista de emails para receber alertas de billing via OCI Notifications. Lista vazia nao cria subscription."
+  type        = list(string)
+  default     = []
 }
 
 variable "freeform_tags" {

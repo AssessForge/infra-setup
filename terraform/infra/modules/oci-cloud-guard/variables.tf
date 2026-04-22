@@ -13,10 +13,10 @@ variable "region" {
   type        = string
 }
 
-variable "notification_email" {
-  description = "Email para receber alertas do Cloud Guard via OCI Notifications. Deixe vazio para não criar subscription."
-  type        = string
-  default     = ""
+variable "notification_emails" {
+  description = "Lista de emails para receber alertas do Cloud Guard via OCI Notifications. Lista vazia nao cria subscription."
+  type        = list(string)
+  default     = []
 }
 
 variable "freeform_tags" {
