@@ -24,10 +24,10 @@ variable "bastion_allowed_cidr" {
   type        = string
 }
 
-variable "notification_email" {
-  description = "Email para alertas do Cloud Guard (opcional)"
-  type        = string
-  default     = ""
+variable "notification_emails" {
+  description = "Lista de emails para alertas do Cloud Guard e do alarme de billing (opcional)"
+  type        = list(string)
+  default     = []
 }
 
 variable "enable_cloud_guard" {

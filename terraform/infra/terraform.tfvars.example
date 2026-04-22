@@ -13,9 +13,9 @@ cluster_name = "assessforge-oke"
 # Seu IP público em CIDR — descobrir via: curl -s ifconfig.me
 bastion_allowed_cidr = "1.2.3.4/32"
 
-# TODO multiplos emails?
-# Email para alertas do Cloud Guard via OCI Notifications (opcional — deixe "" para não criar subscription)
-notification_email = ""
+# Emails para alertas do Cloud Guard e do alarme de billing (opcional — lista vazia nao cria subscription)
+# Exemplo com multiplos destinatarios: ["ops@example.com", "sre@example.com"]
+notification_emails = []
 
 # GitHub OAuth App — GitHub > Settings > Developer Settings > OAuth Apps
 # NUNCA commitar estes valores
