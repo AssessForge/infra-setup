@@ -17,9 +17,9 @@ resources again.
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Cleanup & IAM Bootstrap** - Remove old k8s Terraform code and provision IAM + ArgoCD bootstrap
-- [ ] **Phase 2: GitOps Repository & ESO** - Create gitops-setup repo with ApplicationSet and External Secrets Operator
-- [ ] **Phase 3: ArgoCD Self-Management & Addons** - Wire ArgoCD self-management, Envoy Gateway, cert-manager, and metrics-server end-to-end
+- [x] **Phase 1: Cleanup & IAM Bootstrap** - Remove old k8s Terraform code and provision IAM + ArgoCD bootstrap
+- [x] **Phase 2: GitOps Repository & ESO** - Create gitops-setup repo with ApplicationSet and External Secrets Operator
+- [x] **Phase 3: ArgoCD Self-Management & Addons** - Wire ArgoCD self-management, Envoy Gateway, cert-manager, and metrics-server end-to-end
 
 ## Phase Details
 
@@ -78,6 +78,6 @@ Phases execute in numeric order: 1 → 2 → 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Cleanup & IAM Bootstrap | 0/2 | Not started | - |
-| 2. GitOps Repository & ESO | 0/3 | Not started | - |
-| 3. ArgoCD Self-Management & Addons | 0/3 | Not started | - |
+| 1. Cleanup & IAM Bootstrap | 2/2 | Complete | 2026-04-24 |
+| 2. GitOps Repository & ESO | 3/3 | Complete | 2026-04-24 |
+| 3. ArgoCD Self-Management & Addons | 3/3 | Complete | 2026-04-24 |

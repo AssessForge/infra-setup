@@ -1,8 +1,8 @@
 ---
 phase: 03-argocd-self-management-addons
-verified: 2026-04-10T20:30:00Z
-status: human_needed
-score: 5/5 must-haves verified (code-level)
+verified: 2026-04-24T20:40:00Z
+status: passed
+score: 5/5 must-haves verified (code + human UAT 2026-04-24: SSO, TLS, Gateway routing, metrics-server, no-admin-login all confirmed)
 overrides_applied: 0
 human_verification:
   - test: "Login to ArgoCD at https://argocd.assessforge.com with a GitHub account in the AssessForge org"
