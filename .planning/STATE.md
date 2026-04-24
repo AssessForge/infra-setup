@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-04-09)
 Phase: 03 of 3 (argocd self management & addons)
 Plan: Not started
 Status: Ready to execute
-Last activity: 2026-04-24 - Completed quick task 260423-va5: fix OKE worker node register timeout by adding missing NSG rules between workers and API endpoint
+Last activity: 2026-04-24 - Completed quick task 260423-wcq: criar runbook em markdown com script completo para bastion tunnel e primeira aplicação pos-fase-1
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -85,6 +85,7 @@ None.
 | 260422-j46 | Criar módulo Terraform OCI Monitoring Alarm para billing cost > 0 | 2026-04-22 | 2715272 | [260422-j46-criar-m-dulo-terraform-oci-monitoring-al](./quick/260422-j46-criar-m-dulo-terraform-oci-monitoring-al/) |
 | 260422-qo6 | apply multiple emails to be notified in general | 2026-04-22 | abf1487 | [260422-qo6-apply-multiple-emails-to-be-notified-in-](./quick/260422-qo6-apply-multiple-emails-to-be-notified-in-/) |
 | 260423-va5 | fix OKE worker node register timeout by adding missing NSG rules between workers and API endpoint | 2026-04-24 | 391eca7 | [260423-va5-fix-oke-worker-node-register-timeout-by-](./quick/260423-va5-fix-oke-worker-node-register-timeout-by-/) |
+| 260423-wcq | criar runbook em markdown com script completo para bastion tunnel e primeira aplicação pos-fase-1 | 2026-04-24 | dcb995b | [260423-wcq-criar-runbook-em-markdown-com-script-com](./quick/260423-wcq-criar-runbook-em-markdown-com-script-com/) |
 
 ## Session Continuity
 
