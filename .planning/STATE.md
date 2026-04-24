@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-04-09)
 Phase: 03 of 3 (argocd self management & addons)
 Plan: Not started
 Status: Ready to execute
-Last activity: 2026-04-24 - Completed quick task 260424-0rf: adicionar NSG cloud_shell e rule de ingress no api_endpoint para acesso via Cloud Shell Private Network
+Last activity: 2026-04-24 - Completed quick task 260424-2vo: adicionar ArgoCD repo credential secret para sincronizar gitops-setup privado
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -88,6 +88,7 @@ None.
 | 260423-wcq | criar runbook em markdown com script completo para bastion tunnel e primeira aplicação pos-fase-1 | 2026-04-24 | dcb995b | [260423-wcq-criar-runbook-em-markdown-com-script-com](./quick/260423-wcq-criar-runbook-em-markdown-com-script-com/) |
 | 260423-woo | extrair script bash executável do runbook de bastion para scripts/bastion-first-apply.sh | 2026-04-24 | 2f3b370 | [260423-woo-extrair-script-bash-execut-vel-do-runboo](./quick/260423-woo-extrair-script-bash-execut-vel-do-runboo/) |
 | 260424-0rf | adicionar NSG cloud_shell e rule de ingress no api_endpoint para Cloud Shell Private Network access | 2026-04-24 | 83d51ae + 5eb3eee | [260424-0rf-adicionar-nsg-cloud-shell-e-rule-de-ingr](./quick/260424-0rf-adicionar-nsg-cloud-shell-e-rule-de-ingr/) |
+| 260424-2vo | adicionar ArgoCD repo credential secret para sincronizar gitops-setup privado | 2026-04-24 | af9eaa5 | [260424-2vo-adicionar-kubernetes-secret-v1-de-creden](./quick/260424-2vo-adicionar-kubernetes-secret-v1-de-creden/) |
 
 ## Session Continuity
 
