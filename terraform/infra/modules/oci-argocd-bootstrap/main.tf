@@ -146,6 +146,11 @@ resource "kubectl_manifest" "bootstrap_app" {
         repoURL        = var.gitops_repo_url
         targetRevision = var.gitops_repo_revision
         path           = "bootstrap/control-plane"
+        # recurse = true e obrigatorio -- manifests vivem em addons/*/ e argocd/
+        # Sem isso o ArgoCD so processa o nivel raiz do path (vazio nesse caso).
+        directory = {
+          recurse = true
+        }
       }
       destination = {
         server    = "https://kubernetes.default.svc"
