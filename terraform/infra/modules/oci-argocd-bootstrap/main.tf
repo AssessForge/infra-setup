@@ -146,15 +146,14 @@ resource "kubectl_manifest" "bootstrap_app" {
         repoURL        = var.gitops_repo_url
         targetRevision = var.gitops_repo_revision
         path           = "bootstrap/control-plane"
-        # recurse = true e obrigatorio -- Application/AppSet manifests vivem em
-        # addons/*/application.yaml e argocd/application.yaml.
-        # exclude pula os downstream manifests (Gateway, ClusterIssuer, etc) que
-        # dependem de CRDs que cada addon Application instala via Helm depois.
-        # Sem o exclude, o bootstrap tenta sincronizar Gateway antes do CRD existir
-        # e fica em OutOfSync permanente.
+        # Bootstrap deve sincronizar APENAS os objetos Application e ApplicationSet
+        # (app-of-apps pattern). Qualquer outro YAML no path -- downstream manifests
+        # tipo Gateway, ClusterIssuer, ClusterSecretStore, ExternalSecret -- depende
+        # de CRDs que cada addon Application instala via Helm nas sync-waves seguintes.
+        # include whitelist evita OutOfSync permanente por CRD ausente.
         directory = {
           recurse = true
-          exclude = "{**/manifests/**,**/manifests}"
+          include = "{**/application.yaml,**/*-appset.yaml}"
         }
       }
       destination = {
