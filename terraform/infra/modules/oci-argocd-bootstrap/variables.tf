@@ -50,3 +50,24 @@ variable "gitops_repo_pat" {
   type        = string
   sensitive   = true
 }
+
+variable "tenancy_ocid" {
+  description = "OCID do tenancy (usado no Secret de credenciais ESO -- UserPrincipal auth)"
+  type        = string
+}
+
+variable "eso_user_ocid" {
+  description = "OCID do user ESO (workaround bug IDCS matching-rule; ver project_oci_drg_matching_rule_bug.md)"
+  type        = string
+}
+
+variable "eso_api_key_fingerprint" {
+  description = "Fingerprint da API key do user ESO"
+  type        = string
+}
+
+variable "eso_api_key_private_key_pem" {
+  description = "Private key PEM da API key do user ESO"
+  type        = string
+  sensitive   = true
+}

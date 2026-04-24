@@ -24,3 +24,8 @@ github_oauth_client_secret = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
 # Alarme de billing — alerta por email quando qualquer custo OCI for maior que zero
 enable_billing_alarm = false
+
+# Email do service-account user ESO (workaround para bug IDCS matching-rule).
+# OCI exige email no create-user; pode ser um endereco valido da sua org
+# (não precisa ser monitorado; o user nao tem console access).
+eso_user_email = "eso-sa@example.com"

@@ -129,6 +129,42 @@ resource "kubernetes_secret_v1" "gitops_repo_creds" {
   depends_on = [helm_release.argocd]
 }
 
+# --- ESO OCI API-Key Credentials (workaround bug IDCS matching-rule) ---
+#
+# Seeds o Secret que o ClusterSecretStore `oci-vault` consome para autenticar
+# no OCI Vault via UserPrincipal. Enquanto o bug IDCS (ver memoria do projeto
+# `project_oci_drg_matching_rule_bug.md`) impedir Instance Principal, esse
+# Secret eh a unica via de autenticacao do ESO na OCI.
+#
+# Namespace: argocd (nao external-secrets) porque:
+# - bootstrap do Terraform nao gerencia o namespace external-secrets (criado
+#   pelo Helm chart do ESO via ArgoCD)
+# - ClusterSecretStore.secretRef aceita namespace explicito, entao isso eh ok
+#
+# Campos que o ClusterSecretStore espera ao referenciar: privateKey + fingerprint.
+# tenancy + user ficam inline no ClusterSecretStore YAML (nao no Secret).
+resource "kubernetes_secret_v1" "eso_oci_credentials" {
+  metadata {
+    name      = "eso-oci-credentials"
+    namespace = helm_release.argocd.namespace
+    labels = {
+      "app.kubernetes.io/managed-by" = "terraform"
+      "app.kubernetes.io/component"  = "eso-auth"
+    }
+  }
+
+  type = "Opaque"
+
+  # hashicorp/kubernetes 3.x expoe somente `data` (auto-base64 no envio).
+  # Passamos PEM e fingerprint como strings normais -- o provider codifica.
+  data = {
+    privateKey  = var.eso_api_key_private_key_pem
+    fingerprint = var.eso_api_key_fingerprint
+  }
+
+  depends_on = [helm_release.argocd]
+}
+
 # --- Root Bootstrap Application ---
 
 resource "kubectl_manifest" "bootstrap_app" {

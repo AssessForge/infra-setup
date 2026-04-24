@@ -4,4 +4,4 @@
 .terraform/
 *.tfstate
 
-scripts/
+*.sh

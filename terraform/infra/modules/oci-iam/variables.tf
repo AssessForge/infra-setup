@@ -13,3 +13,8 @@ variable "freeform_tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "eso_user_email" {
+  description = "Email do service-account user ESO (obrigatorio no OCI Identity)"
+  type        = string
+}

@@ -19,6 +19,7 @@ module "oci_iam" {
 
   tenancy_ocid     = var.tenancy_ocid
   compartment_ocid = var.compartment_ocid
+  eso_user_email   = var.eso_user_email
   freeform_tags    = local.freeform_tags
 }
 
@@ -83,16 +84,20 @@ module "oci_vault" {
 module "oci_argocd_bootstrap" {
   source = "./modules/oci-argocd-bootstrap"
 
-  compartment_ocid     = var.compartment_ocid
-  region               = var.region
-  vault_ocid           = module.oci_vault.vault_ocid
-  public_subnet_id     = module.oci_network.public_subnet_id
-  private_subnet_id    = module.oci_network.private_subnet_id
-  gitops_repo_url      = var.gitops_repo_url
-  gitops_repo_revision = var.gitops_repo_revision
-  gitops_repo_pat      = var.gitops_repo_pat
-  cluster_name         = var.cluster_name
-  freeform_tags        = local.freeform_tags
+  compartment_ocid            = var.compartment_ocid
+  tenancy_ocid                = var.tenancy_ocid
+  region                      = var.region
+  vault_ocid                  = module.oci_vault.vault_ocid
+  public_subnet_id            = module.oci_network.public_subnet_id
+  private_subnet_id           = module.oci_network.private_subnet_id
+  gitops_repo_url             = var.gitops_repo_url
+  gitops_repo_revision        = var.gitops_repo_revision
+  gitops_repo_pat             = var.gitops_repo_pat
+  cluster_name                = var.cluster_name
+  eso_user_ocid               = module.oci_iam.eso_user_ocid
+  eso_api_key_fingerprint     = module.oci_iam.eso_api_key_fingerprint
+  eso_api_key_private_key_pem = module.oci_iam.eso_api_key_private_key_pem
+  freeform_tags               = local.freeform_tags
 
   depends_on = [
     module.oci_oke,

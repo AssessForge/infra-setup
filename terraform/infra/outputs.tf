@@ -42,3 +42,18 @@ output "cloud_shell_nsg_id" {
   description = "OCID do NSG para anexar ao OCI Cloud Shell Private Network durante o primeiro apply (ver docs/runbooks/cloud-shell-first-apply.md)"
   value       = module.oci_network.cloud_shell_nsg_id
 }
+
+output "tenancy_ocid" {
+  description = "OCID do tenancy (usado para popular o ClusterSecretStore em gitops-setup)"
+  value       = var.tenancy_ocid
+}
+
+output "eso_user_ocid" {
+  description = "OCID do user ESO (paste no cluster-secret-store.yaml em gitops-setup)"
+  value       = module.oci_iam.eso_user_ocid
+}
+
+output "eso_api_key_fingerprint" {
+  description = "Fingerprint da API key ESO (apenas informativo; ja esta no Secret eso-oci-credentials)"
+  value       = module.oci_iam.eso_api_key_fingerprint
+}

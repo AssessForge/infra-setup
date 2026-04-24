@@ -71,3 +71,8 @@ variable "enable_billing_alarm" {
   type        = bool
   default     = false
 }
+
+variable "eso_user_email" {
+  description = "Email do service-account user ESO (requerido pela OCI Identity ao criar o user)"
+  type        = string
+}
