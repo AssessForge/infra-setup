@@ -90,6 +90,7 @@ module "oci_argocd_bootstrap" {
   private_subnet_id    = module.oci_network.private_subnet_id
   gitops_repo_url      = var.gitops_repo_url
   gitops_repo_revision = var.gitops_repo_revision
+  gitops_repo_pat      = var.gitops_repo_pat
   cluster_name         = var.cluster_name
   freeform_tags        = local.freeform_tags
 

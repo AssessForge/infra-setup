@@ -156,6 +156,30 @@ está rodando no cluster e, a partir deste ponto, toda mudança dentro do cluste
 flui pelo repositório `gitops-setup` — o Terraform não toca mais em recursos
 Kubernetes (boundary documentada em [`CLAUDE.md`](../../CLAUDE.md)).
 
+### Validacao pos-apply: credencial do repositorio GitOps
+
+Apos `terraform apply` concluir, o ArgoCD tentara sincronizar o `bootstrap`
+Application automaticamente (retry ~3 min). Se aparecer `ComparisonError`
+com `authentication required: Repository not found`, verifique se o secret
+de credencial foi criado pelo modulo `oci_argocd_bootstrap`:
+
+```bash
+kubectl get secret gitops-setup-repo -n argocd \
+  -o jsonpath='{.metadata.labels.argocd\.argoproj\.io/secret-type}'
+# Esperado: repository
+```
+
+Para forcar um resync imediato (opcional):
+
+```bash
+kubectl patch application bootstrap -n argocd --type=merge \
+  -p '{"operation":{"sync":{}}}'
+```
+
+Apos o primeiro sync bem-sucedido, o ESO (instalado via AppSet a partir do
+`gitops-setup`) passa a gerenciar essa PAT via OCI Vault — o secret criado
+pelo Terraform permanece como seed idempotente.
+
 ## Passo 8 — Teardown da conexão Cloud Shell
 
 - Reabrir o dropdown **Cloud Shell Network** e escolher **Switch to Public

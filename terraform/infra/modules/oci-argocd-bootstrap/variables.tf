@@ -44,3 +44,9 @@ variable "freeform_tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "gitops_repo_pat" {
+  description = "GitHub Personal Access Token para autenticar o ArgoCD no repositorio privado gitops-setup"
+  type        = string
+  sensitive   = true
+}

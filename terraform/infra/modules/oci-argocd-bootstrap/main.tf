@@ -90,6 +90,44 @@ resource "kubernetes_secret_v1" "gitops_bridge" {
   depends_on = [helm_release.argocd]
 }
 
+# --- ArgoCD Repo Credential (bootstrap seed) ---
+
+# Secret de credencial de repositorio consumido pelo ArgoCD via label
+# `argocd.argoproj.io/secret-type=repository`. Existe para quebrar o
+# chicken-and-egg do bootstrap GitOps: o ExternalSecret que rotaciona esta
+# PAT mora DENTRO do repo `gitops-setup`, mas o ArgoCD nao consegue sincronizar
+# esse repo privado ate ter a credencial. Apos o primeiro sync, ESO assume a
+# rotacao via OCI Vault e este secret vira apenas a semente inicial.
+# username = "oauth2" e o padrao canonico do GitHub para PAT via HTTPS.
+resource "kubernetes_secret_v1" "gitops_repo_creds" {
+  metadata {
+    name      = "gitops-setup-repo"
+    namespace = helm_release.argocd.namespace
+
+    labels = {
+      # Requerido pelo ArgoCD para descobrir secrets de repositorio
+      "argocd.argoproj.io/secret-type" = "repository"
+    }
+  }
+
+  type = "Opaque"
+
+  string_data = {
+    type     = "git"
+    url      = var.gitops_repo_url
+    username = "oauth2"
+    password = var.gitops_repo_pat
+  }
+
+  # ArgoCD pode adicionar annotations de runtime neste secret — ignorar
+  # para evitar drift perpetuo em terraform plan.
+  lifecycle {
+    ignore_changes = [metadata[0].annotations]
+  }
+
+  depends_on = [helm_release.argocd]
+}
+
 # --- Root Bootstrap Application ---
 
 resource "kubectl_manifest" "bootstrap_app" {
