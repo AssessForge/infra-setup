@@ -1,3 +1,11 @@
+terraform {
+  required_providers {
+    oci = {
+      source = "oracle/oci"
+    }
+  }
+}
+
 # VCN principal
 resource "oci_core_vcn" "main" {
   compartment_id = var.compartment_ocid
@@ -256,6 +264,131 @@ resource "oci_core_network_security_group_security_rule" "api_endpoint_ingress_b
       min = 6443
       max = 6443
     }
+  }
+}
+
+# --- Regras api_endpoint <-> workers (exigidas pela OKE para registro dos nodes) ---
+# Referencia: https://docs.oracle.com/en-us/iaas/Content/ContEng/Concepts/contengnetworkconfig.htm
+
+# Workers precisam acessar o Kubernetes API (TCP 6443) para registrar kubelet e executar chamadas de cluster
+resource "oci_core_network_security_group_security_rule" "api_endpoint_ingress_workers_kubeapi" {
+  network_security_group_id = oci_core_network_security_group.api_endpoint.id
+  direction                 = "INGRESS"
+  protocol                  = "6"
+  source                    = oci_core_network_security_group.workers.id
+  source_type               = "NETWORK_SECURITY_GROUP"
+
+  tcp_options {
+    destination_port_range {
+      min = 6443
+      max = 6443
+    }
+  }
+}
+
+# Canal dedicado OKE worker-to-control-plane (TCP 12250) — sem esta regra os nodes nunca concluem o registro
+resource "oci_core_network_security_group_security_rule" "api_endpoint_ingress_workers_okeport" {
+  network_security_group_id = oci_core_network_security_group.api_endpoint.id
+  direction                 = "INGRESS"
+  protocol                  = "6"
+  source                    = oci_core_network_security_group.workers.id
+  source_type               = "NETWORK_SECURITY_GROUP"
+
+  tcp_options {
+    destination_port_range {
+      min = 12250
+      max = 12250
+    }
+  }
+}
+
+# Path MTU Discovery dos workers ate o API endpoint (ICMP type 3 code 4) — evita blackhole de pacotes grandes
+resource "oci_core_network_security_group_security_rule" "api_endpoint_ingress_workers_pmtu" {
+  network_security_group_id = oci_core_network_security_group.api_endpoint.id
+  direction                 = "INGRESS"
+  protocol                  = "1"
+  source                    = oci_core_network_security_group.workers.id
+  source_type               = "NETWORK_SECURITY_GROUP"
+
+  icmp_options {
+    type = 3
+    code = 4
+  }
+}
+
+# Control plane precisa alcancar a kubelet dos workers (TCP 10250) para exec/logs/metrics
+resource "oci_core_network_security_group_security_rule" "api_endpoint_egress_workers_kubelet" {
+  network_security_group_id = oci_core_network_security_group.api_endpoint.id
+  direction                 = "EGRESS"
+  protocol                  = "6"
+  destination               = oci_core_network_security_group.workers.id
+  destination_type          = "NETWORK_SECURITY_GROUP"
+
+  tcp_options {
+    destination_port_range {
+      min = 10250
+      max = 10250
+    }
+  }
+}
+
+# Path MTU Discovery do control plane para os workers (ICMP type 3 code 4)
+resource "oci_core_network_security_group_security_rule" "api_endpoint_egress_workers_pmtu" {
+  network_security_group_id = oci_core_network_security_group.api_endpoint.id
+  direction                 = "EGRESS"
+  protocol                  = "1"
+  destination               = oci_core_network_security_group.workers.id
+  destination_type          = "NETWORK_SECURITY_GROUP"
+
+  icmp_options {
+    type = 3
+    code = 4
+  }
+}
+
+# Control plane alcanca o servico OKE e demais OCI Services via Service Gateway (HTTPS 443)
+resource "oci_core_network_security_group_security_rule" "api_endpoint_egress_oci_services" {
+  network_security_group_id = oci_core_network_security_group.api_endpoint.id
+  direction                 = "EGRESS"
+  protocol                  = "6"
+  destination               = data.oci_core_services.all.services[0].cidr_block
+  destination_type          = "SERVICE_CIDR_BLOCK"
+
+  tcp_options {
+    destination_port_range {
+      min = 443
+      max = 443
+    }
+  }
+}
+
+# Control plane -> kubelet nos workers (TCP 10250) — obrigatorio para exec, logs e port-forward
+resource "oci_core_network_security_group_security_rule" "workers_ingress_from_api_endpoint_kubelet" {
+  network_security_group_id = oci_core_network_security_group.workers.id
+  direction                 = "INGRESS"
+  protocol                  = "6"
+  source                    = oci_core_network_security_group.api_endpoint.id
+  source_type               = "NETWORK_SECURITY_GROUP"
+
+  tcp_options {
+    destination_port_range {
+      min = 10250
+      max = 10250
+    }
+  }
+}
+
+# Path MTU Discovery do control plane para os workers (ICMP type 3 code 4)
+resource "oci_core_network_security_group_security_rule" "workers_ingress_from_api_endpoint_pmtu" {
+  network_security_group_id = oci_core_network_security_group.workers.id
+  direction                 = "INGRESS"
+  protocol                  = "1"
+  source                    = oci_core_network_security_group.api_endpoint.id
+  source_type               = "NETWORK_SECURITY_GROUP"
+
+  icmp_options {
+    type = 3
+    code = 4
   }
 }
 
