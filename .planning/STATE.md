@@ -1,10 +1,10 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.0
-milestone_name: milestone
-status: milestone_complete
-stopped_at: Phase 3 complete — all UAT passed 2026-04-24
-last_updated: "2026-04-24T20:40:00Z"
+milestone_name: AssessForge GitOps Bridge
+status: milestone_archived
+stopped_at: v1.0 milestone completed and archived
+last_updated: "2026-04-24T20:50:41.352Z"
 last_activity: 2026-04-24
 progress:
   total_phases: 3
@@ -18,17 +18,16 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-04-09)
+See: .planning/PROJECT.md (updated 2026-04-24 after v1.0 milestone)
 
 **Core value:** After bootstrap, every cluster change flows exclusively through the GitOps repository via PRs. Terraform never touches in-cluster resources again.
-**Current focus:** Milestone v1.0 complete — ready to archive
+**Current focus:** v1.0 archived — awaiting `/gsd-new-milestone` to scope v1.1
 
 ## Current Position
 
-Phase: 03 of 3 (argocd self management & addons) — COMPLETE
-Plan: N/A (all plans complete)
-Status: Milestone complete (all 3 phases, 8 plans verified)
-Last activity: 2026-04-24 — Phase 03 UAT passed 5/5; SECURITY backfilled for Phases 01 + 02
+Milestone: v1.0 AssessForge GitOps Bridge — SHIPPED 2026-04-24 (tag: v1.0)
+Archived to: `.planning/milestones/v1.0-{ROADMAP,REQUIREMENTS,MILESTONE-AUDIT}.md`
+Status: Milestone archived — ready to plan next milestone
 
 Progress: [██████████] 100%
 
@@ -59,24 +58,19 @@ Progress: [██████████] 100%
 
 ### Decisions
 
-Decisions are logged in PROJECT.md Key Decisions table.
-Recent decisions affecting current work:
+Full decision log lives in PROJECT.md Key Decisions table.
+Carryover into next milestone:
 
-- `terraform/k8s/` code was never applied — no live resources exist, no `terraform destroy` needed
-- Code removal (MIG-01, MIG-02) merged into Phase 1 alongside IAM and bootstrap work
-- MIG-03 (release LB) removed — no live LB was ever created by the old code
-- Instance Principal via Dynamic Groups — Workload Identity requires paid Enhanced tier
-- Envoy Gateway over ingress-nginx — ingress-nginx archived March 2026
-- HTTP-01 cert challenge — simpler, no Cloudflare API token needed
-- ArgoCD self-managed from day one — config drift prevention
+- UserPrincipal ESO auth is a temporary workaround for OCI IDCS `matching_rule` bug — revert to Instance Principal once OCI fixes it (revert path preserved in commit `13e1b65`)
+- Sync-wave ordering flagged for cert-manager ClusterIssuer vs CRD race (audit item T4)
 
 ### Pending Todos
 
-None yet.
+None carried over from v1.0.
 
 ### Blockers/Concerns
 
-None.
+None open. Six non-blocking tech-debt items catalogued in `milestones/v1.0-MILESTONE-AUDIT.md` (T1-T6) for v1.1 triage.
 
 ### Quick Tasks Completed
 
@@ -92,6 +86,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-10T18:15:45.357Z
-Stopped at: Phase 3 context gathered
-Resume file: .planning/phases/03-argocd-self-management-addons/03-CONTEXT.md
+Last session: 2026-04-24 — v1.0 milestone archival
+Stopped at: v1.0 shipped, tagged, and archived; ready for `/gsd-new-milestone`
+Resume file: .planning/PROJECT.md (Next Milestone Goals section)
