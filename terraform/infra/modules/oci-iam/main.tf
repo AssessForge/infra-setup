@@ -14,11 +14,7 @@ terraform {
 # Identity Domain via SCIM (recurso oci_identity_domains_dynamic_resource_group).
 data "oci_identity_domains" "default" {
   compartment_id = var.tenancy_ocid
-
-  display_name      = "Default"
-  home_region_url   = null
-  domain_type       = "DEFAULT"
-  lifecycle_details = "ACTIVE"
+  display_name   = "Default"
 }
 
 locals {
