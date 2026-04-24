@@ -392,6 +392,33 @@ resource "oci_core_network_security_group_security_rule" "workers_ingress_from_a
   }
 }
 
+# NSG — OCI Cloud Shell Private Network (acesso pontual ao API endpoint privado do OKE
+# durante o bootstrap; alternativa ao Bastion tunnel que sofre com TLS handshake timeout
+# no port-forwarding gerenciado — ver docs/runbooks/cloud-shell-first-apply.md)
+resource "oci_core_network_security_group" "cloud_shell" {
+  compartment_id = var.compartment_ocid
+  vcn_id         = oci_core_vcn.main.id
+  display_name   = "assessforge-nsg-cloud-shell"
+  freeform_tags  = var.freeform_tags
+}
+
+# Cloud Shell Private Network → API endpoint (TCP 6443) — libera o operador a rodar
+# `kubectl` e `terraform apply` direto do Cloud Shell enquanto ele estiver anexado ao NSG cloud_shell
+resource "oci_core_network_security_group_security_rule" "api_endpoint_ingress_cloud_shell" {
+  network_security_group_id = oci_core_network_security_group.api_endpoint.id
+  direction                 = "INGRESS"
+  protocol                  = "6" # TCP
+  source                    = oci_core_network_security_group.cloud_shell.id
+  source_type               = "NETWORK_SECURITY_GROUP"
+
+  tcp_options {
+    destination_port_range {
+      min = 6443
+      max = 6443
+    }
+  }
+}
+
 resource "oci_logging_log_group" "vcn_flow_logs" {
   compartment_id = var.compartment_ocid
   display_name   = "assessforge-vcn-flow-logs"

@@ -37,3 +37,8 @@ output "private_subnet_id" {
   description = "OCID da subnet privada (workers)"
   value       = module.oci_network.private_subnet_id
 }
+
+output "cloud_shell_nsg_id" {
+  description = "OCID do NSG para anexar ao OCI Cloud Shell Private Network durante o primeiro apply (ver docs/runbooks/cloud-shell-first-apply.md)"
+  value       = module.oci_network.cloud_shell_nsg_id
+}
