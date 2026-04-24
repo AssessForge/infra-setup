@@ -112,7 +112,8 @@ resource "kubernetes_secret_v1" "gitops_repo_creds" {
 
   type = "Opaque"
 
-  string_data = {
+  # O provider hashicorp/kubernetes auto-encoda base64 ao enviar para a API.
+  data = {
     type     = "git"
     url      = var.gitops_repo_url
     username = "oauth2"
