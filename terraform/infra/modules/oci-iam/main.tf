@@ -29,10 +29,14 @@ resource "oci_identity_policy" "instance_principal_vault" {
   description    = "Permite aos worker nodes OKE ler secrets do OCI Vault via Instance Principal"
   freeform_tags  = var.freeform_tags
 
+  # Identity Domain prefix 'Default/' e obrigatorio em tenancies pos-2023
+  # (todas usam Identity Domains). Sem o prefixo, OCI retorna 404 ao tentar
+  # resolver o dynamic group via Instance Principal -- ESO falha com
+  # "Vault does not exist or you are not authorized to access it".
   statements = [
-    "Allow dynamic-group ${oci_identity_dynamic_group.instance_principal.name} to read secret-family in compartment id ${var.compartment_ocid}",
-    "Allow dynamic-group ${oci_identity_dynamic_group.instance_principal.name} to use vaults in compartment id ${var.compartment_ocid}",
-    "Allow dynamic-group ${oci_identity_dynamic_group.instance_principal.name} to use keys in compartment id ${var.compartment_ocid}",
+    "Allow dynamic-group 'Default'/${oci_identity_dynamic_group.instance_principal.name} to read secret-family in compartment id ${var.compartment_ocid}",
+    "Allow dynamic-group 'Default'/${oci_identity_dynamic_group.instance_principal.name} to use vaults in compartment id ${var.compartment_ocid}",
+    "Allow dynamic-group 'Default'/${oci_identity_dynamic_group.instance_principal.name} to use keys in compartment id ${var.compartment_ocid}",
   ]
 
   depends_on = [oci_identity_dynamic_group.instance_principal]
