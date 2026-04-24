@@ -36,7 +36,9 @@ resource "oci_identity_domains_dynamic_resource_group" "instance_principal" {
 }
 
 # Policy -- worker nodes podem ler secrets do Vault via Instance Principal.
-# Prefixo 'Default/' e obrigatorio pra resolver o DRG dentro do Identity Domain.
+# Usa 'dynamic-group id <ocid>' (vez de 'Default'/name) pra bypassar cache
+# de resolucao de nome do IAM -- o nome era do DG legado destruido e estava
+# apontando pra OCID orfao.
 resource "oci_identity_policy" "instance_principal_vault" {
   compartment_id = var.compartment_ocid
   name           = "assessforge-instance-principal-vault-policy"
@@ -44,9 +46,9 @@ resource "oci_identity_policy" "instance_principal_vault" {
   freeform_tags  = var.freeform_tags
 
   statements = [
-    "Allow dynamic-group 'Default'/${oci_identity_domains_dynamic_resource_group.instance_principal.display_name} to read secret-family in compartment id ${var.compartment_ocid}",
-    "Allow dynamic-group 'Default'/${oci_identity_domains_dynamic_resource_group.instance_principal.display_name} to use vaults in compartment id ${var.compartment_ocid}",
-    "Allow dynamic-group 'Default'/${oci_identity_domains_dynamic_resource_group.instance_principal.display_name} to use keys in compartment id ${var.compartment_ocid}",
+    "Allow dynamic-group id ${oci_identity_domains_dynamic_resource_group.instance_principal.ocid} to read secret-family in compartment id ${var.compartment_ocid}",
+    "Allow dynamic-group id ${oci_identity_domains_dynamic_resource_group.instance_principal.ocid} to use vaults in compartment id ${var.compartment_ocid}",
+    "Allow dynamic-group id ${oci_identity_domains_dynamic_resource_group.instance_principal.ocid} to use keys in compartment id ${var.compartment_ocid}",
   ]
 
   depends_on = [oci_identity_domains_dynamic_resource_group.instance_principal]
