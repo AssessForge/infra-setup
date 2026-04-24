@@ -146,14 +146,18 @@ resource "kubectl_manifest" "bootstrap_app" {
         repoURL        = var.gitops_repo_url
         targetRevision = var.gitops_repo_revision
         path           = "bootstrap/control-plane"
-        # Bootstrap deve sincronizar APENAS os objetos Application e ApplicationSet
-        # (app-of-apps pattern). Qualquer outro YAML no path -- downstream manifests
-        # tipo Gateway, ClusterIssuer, ClusterSecretStore, ExternalSecret -- depende
-        # de CRDs que cada addon Application instala via Helm nas sync-waves seguintes.
-        # include whitelist evita OutOfSync permanente por CRD ausente.
+        # Bootstrap sincroniza APENAS:
+        # 1. O ApplicationSet cluster-addons -- faz o fan-out dos addons
+        #    gerando Apps addon-<name> que sincronizam addons/<name>/ inteiro
+        # 2. A Application argocd/ -- self-manage, nao entra no AppSet
+        #    porque esta fora do path addons/*
+        # NAO incluir addons/<name>/application.yaml diretamente: eles sao
+        # sincronizados pelo proprio AppSet (via nested app-of-apps), e incluir
+        # aqui causaria duplicacao (App "<name>" criado pelo bootstrap +
+        # "<name>" criado por addon-<name>, mesmo recurso, dois donos).
         directory = {
           recurse = true
-          include = "{**/application.yaml,**/*-appset.yaml}"
+          include = "{argocd/application.yaml,addons/cluster-addons-appset.yaml}"
         }
       }
       destination = {
