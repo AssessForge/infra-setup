@@ -1,3 +1,11 @@
+terraform {
+  required_providers {
+    oci = {
+      source = "oracle/oci"
+    }
+  }
+}
+
 # OCI Vault
 resource "oci_kms_vault" "main" {
   compartment_id = var.compartment_ocid

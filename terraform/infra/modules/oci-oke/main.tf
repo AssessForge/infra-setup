@@ -1,3 +1,11 @@
+terraform {
+  required_providers {
+    oci = {
+      source = "oracle/oci"
+    }
+  }
+}
+
 # Versão mais recente estável do Kubernetes no OKE
 data "oci_containerengine_cluster_option" "k8s_versions" {
   cluster_option_id = "all"
@@ -86,10 +94,11 @@ data "oci_containerengine_node_pool_option" "images" {
 }
 
 locals {
-  # Filtra imagens aarch64 (ARM) para shape A1
+  # Filtra imagens aarch64 (ARM) que correspondem a versao do cluster
   arm_images = [
     for s in data.oci_containerengine_node_pool_option.images.sources :
     s if length(regexall("aarch64", s.source_name)) > 0
+    && length(regexall(replace(local.k8s_version, "v", ""), s.source_name)) > 0
   ]
 }
 

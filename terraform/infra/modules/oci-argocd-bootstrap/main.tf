@@ -1,3 +1,11 @@
+terraform {
+  required_providers {
+    kubectl = {
+      source = "alekc/kubectl"
+    }
+  }
+}
+
 # --- ArgoCD via Helm (bootstrap minimo) ---
 
 resource "helm_release" "argocd" {

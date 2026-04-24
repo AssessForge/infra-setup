@@ -1,3 +1,11 @@
+terraform {
+  required_providers {
+    oci = {
+      source = "oracle/oci"
+    }
+  }
+}
+
 # Habilitar Cloud Guard no tenancy
 resource "oci_cloud_guard_cloud_guard_configuration" "main" {
   compartment_id   = var.tenancy_ocid
